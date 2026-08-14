@@ -89,7 +89,46 @@ CREATE INDEX idx_pending_webhooks ON webhook_events(status) WHERE status = 'PEND
 
 ---
 
-## ⚔️ 3. Interview Tips
+## 🚦 3. The Payment Lifecycle State Machine
+
+**Analogy:** Think of booking a hotel room.
+1. **Created:** You make the reservation online.
+2. **Requires Action:** The hotel needs you to complete a 3D Secure verification or 2FA.
+3. **Authorized (Hold):** The hotel puts a temporary $100 "hold" on your card. No money has left your bank yet, but you can't spend that $100 elsewhere.
+4. **Captured (Charge):** When you check out, the hotel finalizes the bill and actually takes the money.
+5. **Void:** You cancel your reservation before checking out. The hotel releases the $100 hold.
+6. **Refund:** You already paid, but later complain about the room. The hotel sends money *back* to you.
+
+### Two-Step Payments (Authorization vs Capture)
+Often, e-commerce stores **authorize** a card when the order is placed, but only **capture** the funds when the physical item is actually shipped. If the item goes out of stock, they simply **void** the authorization without paying refund processing fees.
+
+### Refund Processing & Voids
+- **Void:** Canceling an authorization *before* capture. It is fast and usually incurs no processing fees.
+- **Refund:** Reversing a captured payment. This requires transferring money back across the banking network and often involves **ledger reversals** (creating negative bookkeeping entries to balance the accounts). Refunds can be full or partial.
+
+### The State Diagram
+
+```mermaid
+stateDiagram-v2
+    [*] --> created
+    created --> requires_action: "3D Secure / MFA"
+    requires_action --> authorized: "User authenticates"
+    created --> authorized: "Valid Card"
+    
+    authorized --> captured: "Shipment confirmed"
+    authorized --> voided: "Order cancelled (Void)"
+    
+    captured --> settled: "Funds hit bank account"
+    captured --> refunded: "Customer returns item"
+    captured --> disputed: "Customer initiates chargeback"
+    
+    created --> failed: "Declined (Insufficient funds)"
+    requires_action --> failed: "Failed authentication"
+```
+
+---
+
+## ⚔️ 4. Interview Tips
 
 ### Q: Stripe is down and returning 500 Errors. How do you save sales?
 **3-Point Pitch:**

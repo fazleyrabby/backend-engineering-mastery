@@ -52,11 +52,11 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 | Module | Core Domain | Focus Topics | Progress Status |
 | :--- | :--- | :--- | :---: |
 | **01** | [**CS Fundamentals**](cs-fundamentals/) | CPU, Memory, Linux I/O, `epoll`, TCP/TLS 1.3, Big-O, Dynamic Programming, OWASP | `8 / 8 Complete` |
-| **02** | [**Database Deep Dives**](database-deep-dives/) | MySQL InnoDB Buffer Pool, ClickHouse Columnar MergeTree, Redis SDS & Redlock | `3 / 3 Complete` |
-| **03** | [**System Design & Real-Time**](system-design/) | WebSockets, Financial Idempotency, Kafka Pub/Sub, Sharding, Saga, Fraud Engine | `9 / 9 Complete` |
+| **02** | [**Database Deep Dives**](database-deep-dives/) | MySQL InnoDB Buffer Pool, ClickHouse Columnar MergeTree, Redis SDS & Redlock, SQL Mastery | `5 / 5 Complete` |
+| **03** | [**System Design & Real-Time**](system-design/) | WebSockets, Financial Idempotency, Kafka Pub/Sub, Sharding, Saga, Fraud Engine, Reconciliation | `13 / 13 Complete` |
 | **04** | [**Laravel Internals**](laravel-internals/) | Reflection Container, Request Lifecycle, Eloquent Hydration, Octane Safety | `4 / 4 Complete` |
 | **05** | [**Cloud & DevOps**](cloud-devops/) | Docker Kernel Namespaces, CI/CD, AWS Architecture, Terraform, SAA-C03 Guide | `5 / 5 Complete` |
-| **06** | [**Interview Practice**](interview-practice/) | 30 Senior Architectural Questions & Resume-Tailored Domain Deep Dives | `2 / 2 Complete` |
+| **06** | [**Interview Practice**](interview-practice/) | 35 Architectural Questions, Domain Deep Dives & Financial Testing | `3 / 3 Complete` |
 
 ---
 
@@ -78,6 +78,7 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 - [x] 📄 [**`02_clickhouse_columnar_mergetree.md`**](database-deep-dives/02_clickhouse_columnar_mergetree.md) — Columnar OLAP Storage Engine, Sparse Indexing & MergeTree Part Compression.
 - [x] 📄 [**`03_redis_structures_locks.md`**](database-deep-dives/03_redis_structures_locks.md) — Redis SDS, SkipLists, Redlock Distributed Lock Algorithm & Atomic Lua Scripts.
 - [x] 📄 [**`04_postgresql_internals_wal_vacuum.md`**](database-deep-dives/04_postgresql_internals_wal_vacuum.md) — PostgreSQL MVCC (Tuple Versioning), Write-Ahead Logging (WAL), Auto-VACUUM & GIN/JSONB Indexing.
+- [x] 📄 [**`05_sql_mastery_joins_ctes_windows.md`**](database-deep-dives/05_sql_mastery_joins_ctes_windows.md) — JOINs Deep Dive, GROUP BY & Aggregations, CTEs, Window Functions (ROW_NUMBER, RANK, SUM OVER), Cursor Pagination.
 
 ---
 
@@ -94,6 +95,7 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 - [x] 📄 [**`10_grpc_graphql_opentelemetry.md`**](system-design/10_grpc_graphql_opentelemetry.md) — gRPC over HTTP/2, Protobuf Serialization, GraphQL vs REST, OpenTelemetry & Jaeger Tracing.
 - [x] 📄 [**`11_elasticsearch_opensearch_inverted_index.md`**](system-design/11_elasticsearch_opensearch_inverted_index.md) — Inverted Indexes, BM25 / TF-IDF Relevance Scoring, Lucene Segment Merges & Cluster Sharding.
 - [x] 📄 [**`12_ai_vector_databases_pgvector_sse.md`**](system-design/12_ai_vector_databases_pgvector_sse.md) — Vector Embeddings, HNSW Graph Indexing vs IVFFlat, pgvector & Streaming LLM responses via SSE.
+- [x] 📄 [**`13_reconciliation_matching_systems.md`**](system-design/13_reconciliation_matching_systems.md) — Transaction Reconciliation, Matching Algorithms, Discrepancy Detection, Settlement File Parsing & Resolution Workflows.
 
 ---
 
@@ -117,8 +119,9 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 ---
 
 ### 🎯 Module 6: Technical Interview Preparation & Resume Deep-Dives
-- [x] 📄 [**`01_master_30_interview_questions.md`**](interview-practice/01_master_30_interview_questions.md) — Complete Answer Strategies & Architectural Breakdowns for the **30 Core Senior Interview Questions**.
+- [x] 📄 [**`01_master_30_interview_questions.md`**](interview-practice/01_master_30_interview_questions.md) — Complete Answer Strategies & Architectural Breakdowns for the **35 Core Senior Interview Questions** (incl. Auth vs Capture, Webhook HMAC, Isolation Levels, Reconciliation, Testing).
 - [x] 📄 [**`02_php_laravel_domain_deep_dives.md`**](interview-practice/02_php_laravel_domain_deep_dives.md) — Tailored Interview Q&A for **Payment Gateways, Fraud Engines, Out-of-Order Webhooks, ClickHouse OLAP vs MySQL, and FrankenPHP**.
+- [x] 📄 [**`03_testing_financial_systems.md`**](interview-practice/03_testing_financial_systems.md) — Testing Financial Systems: Unit/Integration/Feature Tests, Mocking Payment APIs, Race Conditions, Currency Rounding & Edge Cases.
 
 ---
 

@@ -113,3 +113,18 @@ In Staff & Senior Backend engineering interviews (and everyday engineering discu
 
 ### 30. Explain a complex system you built end-to-end.
 > **Answer Strategy:** Walk through: Problem ➔ Functional/Non-functional Requirements ➔ Architecture Diagram ➔ DB Schema Choice ➔ Failure Cases & Idempotency Handles ➔ Monitoring & Trade-offs.
+
+### 31. What is the difference between authorization and capture in payments?
+> **Answer Strategy:** 1. **The Analogy:** Like a hotel check-in, an authorization places a temporary hold on funds without moving money. 2. **Two-Step Flow:** E-commerce stores auth at checkout, but capture when the item actually ships. 3. **Void vs Refund:** Canceling an auth is a "void" (instant, no fees), while reversing a capture is a "refund" (slower, requires ledger reversal, incurs fees).
+
+### 32. How do you verify a webhook is authentic?
+> **Answer Strategy:** 1. **Shared Secret & HMAC:** The provider hashes the payload with a shared secret (HMAC-SHA256) and sends the signature in a header. 2. **Verification:** Our server recalculates the hash and compares them to ensure the payload wasn't tampered with. 3. **Timestamp Replay:** We check the request timestamp header to reject old requests, preventing replay attacks.
+
+### 33. What are database isolation levels and when do you use each?
+> **Answer Strategy:** 1. **Read Committed:** T1 reads X=5. T2 updates X=10 and commits. T1 reads again and sees X=10. Good for general apps. 2. **Repeatable Read:** T1 reads X=5. T2 updates X=10. T1 reads again and still sees X=5. Prevents data changing mid-transaction (MySQL default). 3. **Serializable:** Fully locks accessed rows/ranges, making transactions execute sequentially. Use for strict financial calculations.
+
+### 34. How would you design a reconciliation system?
+> **Answer Strategy:** 1. **Daily Cron:** Schedule a background job to run every night at off-peak hours. 2. **Matching Algorithm:** Fetch the provider's settlement CSV and match `transaction_id` and `amount_cents` against internal database ledger entries. 3. **Discrepancy Reports:** Automatically alert the finance team with a report of any missing records, fee mismatches, or stranded funds.
+
+### 35. How do you test a payment integration?
+> **Answer Strategy:** 1. **Mocking HTTP:** In unit tests, use a library to intercept HTTP calls and mock Stripe's JSON responses, never hitting the real network. 2. **Edge Cases:** Explicitly write tests for network timeouts, 500 server errors, and duplicate webhook replays. 3. **Database Transactions:** Ensure integration tests verify that on a failed payment, the database correctly rolls back any partial state changes.
