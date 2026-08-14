@@ -102,6 +102,8 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 - [x] 📄 [**`02_request_lifecycle_middleware.md`**](laravel-internals/02_request_lifecycle_middleware.md) — End-to-End Request Lifecycle, Service Provider Booting & Middleware Pipeline.
 - [x] 📄 [**`03_eloquent_hydration_n_plus_one.md`**](laravel-internals/03_eloquent_hydration_n_plus_one.md) — Active Record Hydration Overhead, Model Memory Footprint & N+1 Eager Loading.
 - [x] 📄 [**`04_queue_architecture_worker_lifecycle.md`**](laravel-internals/04_queue_architecture_worker_lifecycle.md) — Queue Payload Serialization, Redis Workers, Job Retries & Memory Limit Recycling.
+- [x] 📄 [**`05_events_listeners_broadcasting.md`**](laravel-internals/05_events_listeners_broadcasting.md) — Events, Synchronous vs Queued Listeners & Real-Time Broadcasting.
+- [x] 📄 [**`06_facades_macros_metaprogramming.md`**](laravel-internals/06_facades_macros_metaprogramming.md) — Facade `__callStatic()` Magic, `Macroable` Metaprogramming & Contracts vs Facades.
 
 ---
 
