@@ -50,5 +50,5 @@ Detailed answers available in [`interview-practice/01_master_30_interview_questi
 
 ## 👤 Author & License
 
-- **Author:** Backend Developer
+- **Author:** Md. Fazley Rabbi (Backend Developer)
 - **License:** MIT License
