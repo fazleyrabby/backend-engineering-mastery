@@ -50,5 +50,5 @@ Detailed answers available in [`interview-practice/01_master_30_interview_questi
 
 ## 👤 Author & License
 
-- **Author:** Md. Fazley Rabbi (Senior Backend Engineer & Staff Architect Target)
+- **Author:** Backend Developer
 - **License:** MIT License
