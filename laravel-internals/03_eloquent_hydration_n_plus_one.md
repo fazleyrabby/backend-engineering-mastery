@@ -45,41 +45,58 @@ sequenceDiagram
 
 ---
 
-## 💻 3. Step-by-Step Code Example
+## 💻 3. Step-by-Step Code Example (Laravel / PHP 8.2+)
 
-Here is how you can use Python (SQLAlchemy) to automatically block the N+1 problem from happening!
-
-```python
-from sqlalchemy.orm import declarative_base, relationship
-from sqlalchemy import Column, Integer
-
-Base = declarative_base()
-
-class User(Base):
-    __tablename__ = 'users'
-    
-    # Step 1: Define the primary key
-    id = Column(Integer, primary_key=True)
-    
-    # Step 2: Define the relationship to "Posts"
-    # By setting lazy="raise", we tell the ORM:
-    # "If a developer tries to fetch posts ONE BY ONE (N+1), crash the app!"
-    # This forces them to ask for everything at once (Eager Loading).
-    posts = relationship("Post", lazy="raise")
-```
+Here is how you detect and fix the N+1 problem in Laravel!
 
 ```php
 <?php
-// In Laravel, we can do the exact same thing in our AppServiceProvider!
+// === Step 1: Define the Relationship in your Model ===
 
+class User extends Model
+{
+    // Tell Eloquent that a User "has many" Posts.
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class);
+    }
+}
+
+// === Step 2: The BAD Way (N+1 Problem) ===
+
+// 1 query: SELECT * FROM users
+$users = User::all();
+
+foreach ($users as $user) {
+    // N queries: SELECT * FROM posts WHERE user_id = ?
+    // Each loop iteration hits the database AGAIN! 💀
+    echo $user->posts->count();
+}
+// Total: 1 + N queries (if 100 users = 101 queries!)
+
+// === Step 3: The GOOD Way (Eager Loading) ===
+
+// Query 1: SELECT * FROM users
+// Query 2: SELECT * FROM posts WHERE user_id IN (1, 2, 3, ...)
+$users = User::with('posts')->get();
+
+foreach ($users as $user) {
+    // No extra queries! Posts are already loaded in memory. ⚡
+    echo $user->posts->count();
+}
+// Total: Always just 2 queries, no matter how many users!
+
+// === Step 4: Auto-Detection (Crash on N+1 in Development) ===
+
+// In AppServiceProvider::boot()
 use Illuminate\Database\Eloquent\Model;
 
 class AppServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        // Step 1: Tell Laravel to throw an error if anyone causes an N+1 problem!
-        // This keeps our library runs fast and efficient.
+        // This tells Laravel: "If anyone causes an N+1 problem,
+        // throw an exception!" Only enabled in development.
         Model::preventLazyLoading(! app()->isProduction());
     }
 }

@@ -95,17 +95,17 @@ graph TD
     Client["Client App"] -->|Executes UPDATE| DB["Postgres Engine"]
     
     subgraph "Postgres Architecture"
-        DB -->|1. Write changes| Mem["Shared Buffers (Memory)"]
-        DB -->|2. Append sequential log| WAL["Write-Ahead Log (Disk)"]
+        DB -->|"1. Write changes"| Mem["Shared Buffers - Memory"]
+        DB -->|"2. Append sequential log"| WAL["Write-Ahead Log - Disk"]
         
-        Mem -.->|3. Lazy flush (BgWriter)| Data["Data Files (Disk)"]
+        Mem -.->|"3. Lazy flush via BgWriter"| Data["Data Files - Disk"]
         
         WAL -.->|Crash Recovery| Data
     end
     
-    subgraph "MVCC (Tuple Versioning)"
-        Data --> V1["Tuple V1 (Dead, xmax=102)"]
-        Data --> V2["Tuple V2 (Live, xmin=102)"]
+    subgraph "MVCC - Tuple Versioning"
+        Data --> V1["Tuple V1 - Dead, xmax=102"]
+        Data --> V2["Tuple V2 - Live, xmin=102"]
     end
     
     subgraph "Vacuum Process"

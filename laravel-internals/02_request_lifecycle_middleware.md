@@ -45,35 +45,79 @@ sequenceDiagram
 
 ---
 
-## 💻 3. Step-by-Step Code Example
+## 💻 3. Step-by-Step Code Example: PHP & Laravel 11 Middleware
 
-Let's look at how this pipeline is built using simple Python code!
+Let's look at how middleware and the pipeline work in Laravel 11!
 
-```python
-from typing import Callable, Any
+```php
+<?php
 
-# Step 1: Define what our "Gate" (Controller) does.
-def controller_action(request: str) -> str:
-    # This is the core application logic.
-    return f"Processed {request} at the gate!"
+namespace App\Http\Middleware;
 
-# Step 2: Create our Pipeline (Security Checkpoints).
-def build_pipeline(middlewares: list[type], core_action: Callable) -> Callable:
-    # We start with the destination.
-    pipeline = core_action
-    
-    # We wrap the destination with layers (middlewares) from the inside out.
-    for middleware_class in reversed(middlewares):
-        middleware_instance = middleware_class()
-        
-        # We define a function that runs the middleware, then passes you to the next step.
-        def wrap(request: Any, next_call: Callable = pipeline, m=middleware_instance) -> Any:
-            # Check the request, then hand it off to the next layer!
-            return m.handle(request, next_call)
-            
-        pipeline = wrap
-        
-    return pipeline
+use Closure;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Log;
+
+// Step 1: Create a custom Middleware class (The Security Checkpoint)
+class EnsureTokenIsValid
+{
+    /**
+     * Handle an incoming request.
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        // Step 2: "Before" middleware logic - inspect incoming request
+        if ($request->header('X-API-TOKEN') !== 'secret-token') {
+            // Short-circuit: return early and reject request if check fails
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Step 3: Pass request deeper into the onion (to next middleware or controller)
+        $response = $next($request);
+
+        // Step 4: "After" middleware logic - modify response on the way out
+        $response->headers->set('X-Security-Checked', 'true');
+
+        return $response;
+    }
+}
+
+// Step 5: Terminating Middleware - runs tasks AFTER response is sent to user
+class LogRequestDuration
+{
+    public function handle(Request $request, Closure $next): Response
+    {
+        return $next($request);
+    }
+
+    /**
+     * Handle tasks after HTTP response has been sent to the browser.
+     */
+    public function terminate(Request $request, Response $response): void
+    {
+        // Step 6: Log metrics without slowing down user response time
+        Log::info('Request completed', [
+            'url' => $request->fullUrl(),
+            'status' => $response->getStatusCode(),
+        ]);
+    }
+}
+
+// Step 7: Laravel 11 registration in bootstrap/app.php
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__.'/../routes/web.php',
+        commands: __DIR__.'/../routes/console.php',
+    )
+    ->withMiddleware(function (Middleware $middleware) {
+        // Step 8: Append global middleware to the pipeline
+        $middleware->append(EnsureTokenIsValid::class);
+        $middleware->append(LogRequestDuration::class);
+    })
+    ->create();
 ```
 
 ---

@@ -48,6 +48,46 @@ Detailed answers available in [`interview-practice/01_master_30_interview_questi
 
 ---
 
+## 🤝 Contributing
+
+Contributions are welcome! Whether you want to fix a typo, improve an explanation, add a missing topic, or translate content — every contribution helps the community.
+
+### How to Contribute
+
+1. **Fork** this repository
+2. **Create a branch** for your change (`git checkout -b fix/tcp-congestion-section`)
+3. **Make your changes** following the conventions below
+4. **Submit a Pull Request** with a clear description of what you changed and why
+
+### What You Can Contribute
+
+- 🐛 **Fix errors** — Spotted a technical inaccuracy or typo? Open a PR
+- 📝 **Improve explanations** — Make a concept clearer or add a better analogy
+- ➕ **Add missing topics** — See a gap in coverage? Add a new section or file
+- 💻 **Add/improve code examples** — All code should be **Python 3.11+** with type hints
+- 📊 **Add diagrams** — Mermaid diagrams that clarify architecture or data flow
+- 🌍 **Translations** — Help make this accessible in other languages
+
+### File & Content Conventions
+
+| Convention | Rule |
+| :--- | :--- |
+| **Language** | All application code examples must use **Python 3.11+** (`asyncio`, `FastAPI`, `SQLAlchemy 2.0`, `Celery`) |
+| **Type hints** | Use modern type hints (`list[str]`, `dict[str, Any]`, `Optional[int]`) |
+| **File naming** | `XX_snake_case_topic_name.md` (e.g., `05_data_structures_big_o.md`) |
+| **Lesson structure** | Follow the **4-phase blueprint**: 💡 Concept → 🔬 Mechanics → 💻 Code & Benchmarks → ⚔️ Interview Scenarios |
+| **Mermaid diagrams** | Double-quote labels with parentheses: `["Node (info)"]` |
+| **Tone** | Beginner-friendly with real-world analogies, but technically deep enough for Staff Engineers |
+
+### Reporting Issues
+
+If you find something wrong but don't have time to fix it, [open an issue](../../issues) describing:
+- Which file and section has the problem
+- What's incorrect or missing
+- (Optional) What the fix should be
+
+---
+
 ## 👤 Author & License
 
 - **Author:** Md. Fazley Rabbi (Backend Developer)

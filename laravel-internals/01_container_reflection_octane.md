@@ -31,52 +31,84 @@ sequenceDiagram
     Container-->>Router: Step 7: Return ready-to-use Controller
 ```
 
-## 3. Annotated Python Code: Persistent Memory
+## 3. Annotated Laravel Code: Auto-Wiring & Octane Safety
 
-Here is how Dependency Injection looks in a persistent Python runtime (FastAPI), acting similar to Octane. We have to be careful with memory!
+Here is how Dependency Injection and auto-wiring work in Laravel. In persistent runtimes like Laravel Octane, we use scoped bindings to stay memory-safe!
 
-```python
-from fastapi import APIRouter, Depends
-from typing import Annotated
+```php
+<?php
 
-# 1. Define an Interface (Contract) for payment gateways
-class PaymentGatewayInterface:
-    pass
+namespace App\Services;
 
-# 2. Define the concrete implementation
-class StripeGateway(PaymentGatewayInterface):
-    def __init__(self, secret_key: str):
-        # 3. Store the key for later use
-        self.secret_key = secret_key
+use App\Contracts\PaymentGatewayInterface;
+use App\Models\Order;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\ServiceProvider;
 
-class OrderService:
-    def process(self, order_id: str, gateway: PaymentGatewayInterface) -> str:
-        # 4. Process the order using the injected gateway
-        return "processed"
+// 1. Define an Interface (Contract) for payment gateways
+interface PaymentGatewayInterface
+{
+    public function charge(int $amount): string;
+}
 
-# 5. Dependency Provider: creates a fresh instance per request
-def get_payment_gateway() -> PaymentGatewayInterface:
-    # 6. We do this per-request to avoid sharing state between users (Memory Safety!)
-    return StripeGateway(secret_key="sk_live_...")
+// 2. Define the concrete implementation
+class StripeGateway implements PaymentGatewayInterface
+{
+    // 3. Store the API secret key via constructor promotion
+    public function __construct(
+        private readonly string $secretKey
+    ) {}
 
-def get_order_service() -> OrderService:
-    # 7. Provide the OrderService
-    return OrderService()
+    public function charge(int $amount): string
+    {
+        // Return transaction confirmation
+        return "charged_{$amount}_via_stripe";
+    }
+}
 
-router = APIRouter()
+// 4. Service that depends on the interface contract
+class OrderService
+{
+    public function __construct(
+        private readonly PaymentGatewayInterface $gateway
+    ) {}
 
-@router.post("/checkout/{order_id}")
-async def process_checkout(
-    order_id: str,
-    # 8. Inject dependencies via FastAPI's DI system
-    order_service: Annotated[OrderService, Depends(get_order_service)],
-    gateway: Annotated[PaymentGatewayInterface, Depends(get_payment_gateway)]
-) -> dict[str, str]:
-    # 9. Execute business logic with fully wired dependencies
-    status = order_service.process(order_id, gateway)
-    
-    # 10. Return response. Objects are cleaned up after this by Garbage Collection.
-    return {"status": status}
+    public function process(string $orderId, int $amount): string
+    {
+        // 5. Delegate payment processing to the injected gateway
+        return $this->gateway->charge($amount);
+    }
+}
+
+// 6. Controller: Laravel auto-wires OrderService into the constructor via Reflection
+class CheckoutController
+{
+    public function __construct(
+        private readonly OrderService $orderService
+    ) {}
+
+    public function processCheckout(string $orderId): JsonResponse
+    {
+        // 7. Execute business logic with fully resolved dependencies
+        $status = $this->orderService->process($orderId, 4999);
+
+        // 8. Return response (cleaned up per request cycle)
+        return response()->json(['status' => $status]);
+    }
+}
+
+// 9. Service Provider: Register bindings into the Laravel Service Container
+class AppServiceProvider extends ServiceProvider
+{
+    public function register(): void
+    {
+        // 10. Bind interface to concrete implementation.
+        // For Laravel Octane: use scoped() instead of singleton() to reset state between requests!
+        $this->app->scoped(PaymentGatewayInterface::class, function ($app) {
+            return new StripeGateway(config('services.stripe.secret'));
+        });
+    }
+}
 ```
 
 ## 4. Architectural Trade-offs & Failure Modes

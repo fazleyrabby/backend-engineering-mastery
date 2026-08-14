@@ -29,37 +29,67 @@ sequenceDiagram
     end
 ```
 
-## 3. Annotated Python Code: Safe Worker Memory
+## 3. Annotated Laravel Code: Safe Worker Memory & Job Lifecycle
 
-Here is how a background worker looks in Python using Celery. Workers are long-lived, so we have to manually manage memory sometimes!
+Here is how a background job is built and dispatched in Laravel. Workers are long-lived CLI processes, so model serialization and retry strategies keep execution safe!
 
-```python
-import logging
-from celery import Task
-from celery.app import shared_task
-from app.models import Video
+```php
+<?php
 
-# 1. Define a background task (Job) that workers will pick up
-@shared_task(
-    bind=True, 
-    # 2. Retry strategy: Try up to 3 times if it fails
-    max_retries=3,
-    # 3. Memory safety: Hard stop after 120 seconds to prevent getting stuck
-    time_limit=120
-)
-def transcode_video_job(self: Task, video_id: int) -> None:
-    # 4. Fetch fresh data from the database using the ID provided
-    video = Video.query.get(video_id)
-    
-    # 5. Log that we are starting the heavy task
-    logging.info(f"Transcoding started for video: {video.id}")
-    
-    # 6. Simulate a memory-heavy task (e.g., loading a video into RAM)
-    buffer = "A" * (1024 * 1024 * 50) # 50MB allocation
-    
-    # 7. Manually delete large variables to help Garbage Collection
-    # This prevents the long-lived worker process from bloating and crashing!
-    del buffer
+namespace App\Jobs;
+
+use App\Models\Video;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Http\JsonResponse;
+
+// 1. Implement ShouldQueue so Laravel pushes this to the queue instead of running synchronously
+class TranscodeVideoJob implements ShouldQueue
+{
+    // 2. SerializesModels saves only Model IDs in the queue payload (saving RAM and payload size)
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    // 3. Retry strategy: Try up to 3 times before failing
+    public int $tries = 3;
+
+    // 4. Backoff strategy: Wait 10s, then 30s before retrying
+    public array $backoff = [10, 30];
+
+    // 5. Time limit: Maximum seconds the worker is allowed to run this job
+    public int $timeout = 120;
+
+    // 6. Injected Eloquent model is automatically serialized to its ID
+    public function __construct(
+        public Video $video
+    ) {}
+
+    public function handle(): void
+    {
+        // 7. SerializesModels re-queries the fresh Video model from DB when the worker starts
+        Log::info("Transcoding started for video: {$this->video->id}");
+
+        // 8. Execute heavy background task (e.g. video transcoding)
+        // Workers process this in CLI memory without blocking the web request
+    }
+}
+
+// 9. Dispatching the Job from a Controller
+class VideoController
+{
+    public function transcode(Video $video): JsonResponse
+    {
+        // 10. Dispatch job to Redis queue; returns immediately to user (HTTP Cashier)
+        TranscodeVideoJob::dispatch($video);
+
+        return response()->json([
+            'message' => 'Video transcoding queued successfully!',
+        ], 202);
+    }
+}
 ```
 
 ## 4. Architectural Trade-offs & Limits
