@@ -1,0 +1,13 @@
+# Ignore LeetCode folder
+leetcode/
+
+# Ignore HTML files
+*.html
+
+# OS / IDE generated files
+.DS_Store
+.vscode/
+.idea/
+
+# Local logs
+*.log
