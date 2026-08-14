@@ -77,6 +77,7 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 - [x] 📄 [**`01_mysql_innodb_internals.md`**](database-deep-dives/01_mysql_innodb_internals.md) — InnoDB Storage Architecture, Buffer Pool Midpoint LRU, Clustered B+Trees & MVCC Read Views.
 - [x] 📄 [**`02_clickhouse_columnar_mergetree.md`**](database-deep-dives/02_clickhouse_columnar_mergetree.md) — Columnar OLAP Storage Engine, Sparse Indexing & MergeTree Part Compression.
 - [x] 📄 [**`03_redis_structures_locks.md`**](database-deep-dives/03_redis_structures_locks.md) — Redis SDS, SkipLists, Redlock Distributed Lock Algorithm & Atomic Lua Scripts.
+- [x] 📄 [**`04_postgresql_internals_wal_vacuum.md`**](database-deep-dives/04_postgresql_internals_wal_vacuum.md) — PostgreSQL MVCC (Tuple Versioning), Write-Ahead Logging (WAL), Auto-VACUUM & GIN/JSONB Indexing.
 
 ---
 
@@ -90,6 +91,9 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 - [x] 📄 [**`07_staff_architecture_adrs_postmortems.md`**](system-design/07_staff_architecture_adrs_postmortems.md) — Staff Architectural Leadership, Architectural Decision Records (ADR) & Blameless RCAs.
 - [x] 📄 [**`08_real_world_fraud_engine_architecture.md`**](system-design/08_real_world_fraud_engine_architecture.md) — Production Fraud Engine Architecture (IP Risk, BIN/ASN Proxy, Device Fingerprints, Redis ZSET Velocity).
 - [x] 📄 [**`09_payment_gateway_outbox_webhooks.md`**](system-design/09_payment_gateway_outbox_webhooks.md) — Multi-Gateway Strategy Pattern, Timeout Handling, Out-of-Order Webhooks & Transactional Outbox Pattern.
+- [x] 📄 [**`10_grpc_graphql_opentelemetry.md`**](system-design/10_grpc_graphql_opentelemetry.md) — gRPC over HTTP/2, Protobuf Serialization, GraphQL vs REST, OpenTelemetry & Jaeger Tracing.
+- [x] 📄 [**`11_elasticsearch_opensearch_inverted_index.md`**](system-design/11_elasticsearch_opensearch_inverted_index.md) — Inverted Indexes, BM25 / TF-IDF Relevance Scoring, Lucene Segment Merges & Cluster Sharding.
+- [x] 📄 [**`12_ai_vector_databases_pgvector_sse.md`**](system-design/12_ai_vector_databases_pgvector_sse.md) — Vector Embeddings, HNSW Graph Indexing vs IVFFlat, pgvector & Streaming LLM responses via SSE.
 
 ---
 
