@@ -1,17 +1,17 @@
-# Staff/Senior Python/FastAPI & Real-World Domain Interview Blueprint
+# Staff/Senior Domain Architecture Interview Blueprint
 
 > **Module:** Interview Practice (Topic 6.2)  
-> **Source Mapping:** Experience at *Electronic First FZ LLE* & Portfolio Resume Analysis
+> **Target:** Real-World Production & High-Volume Financial System Design
 
 ---
 
-## 🎯 Tailored Focus Areas Based on Your Actual Resume
+## 🎯 Production System Scenarios Covered
 
-Based on your 5+ years of experience at **Electronic First** and your portfolio:
-- You built a **Configurable Fraud Detection Engine** (IP, Card, Velocity, BIN/ASN validation, Risk scoring).
-- You integrated **Checkout.com, PayPal, Apple Pay, Google Pay, and Webhook-driven Dispute Sync**.
-- You engineered **ClickHouse OLAP analytics dashboards** for customer behavior & gateway performance.
-- You maintain a **Homelab with 41+ Docker containers, Traefik, Uvicorn/Gunicorn, and Cloudflare Tunnels**.
+This guide covers real-world architectural design patterns derived from high-volume production environments:
+- **Configurable Fraud Engines:** IP, Card, Velocity, BIN/ASN validation & Risk scoring under 50ms.
+- **Payment Gateway Integrations:** Checkout.com, PayPal, Apple Pay, Google Pay & Webhook Dispute Sync.
+- **OLAP Analytics Engines:** ClickHouse analytics dashboards for customer behavior & gateway metrics.
+- **Infrastructure & Production Environments:** Docker container orchestration, Traefik reverse proxies, Uvicorn/Gunicorn & Cloudflare Tunnels.
 
 ---
 
