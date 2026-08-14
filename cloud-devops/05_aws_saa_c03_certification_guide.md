@@ -57,6 +57,21 @@ graph TD
 - **S3 Glacier:** Cost-effective, data is mathematically zipped and spread across cold tapes. Retrieval requires 3-12 hours of unpacking.
 - **EBS (gp3):** Network-attached block storage. Decoupled from the EC2 instance lifecycle.
 
+### AWS Core Services Architecture Reference Matrix
+
+| Category | AWS Service | Core Architectural Purpose | Senior Trade-off / Limit |
+| :--- | :--- | :--- | :--- |
+| **Compute** | **EC2 / ASG** | Virtual Machines with Auto Scaling Groups for stateful/monolithic workloads. | Slow cold-start scale times (3-5 min) compared to container pods. |
+| **Compute** | **AWS Lambda** | Event-driven Serverless compute execution engine. | 15-minute execution limit; cold starts on VPC placement. |
+| **Containers**| **ECS Fargate** | Serverless container orchestration (no EC2 node management). | Higher per-CPU cost than raw reserved EC2 instances. |
+| **Containers**| **EKS (Kubernetes)**| Managed Kubernetes control plane (kube-apiserver/etcd). | Operational complexity & control plane hourly fee. |
+| **Database** | **RDS (Aurora)** | MySQL/Postgres relational database with 6-way storage replication. | Expensive per-hour cost; hard connection limits. |
+| **Database** | **DynamoDB** | Single-digit millisecond NoSQL key-value & document store. | Requires careful partition key design to avoid hot partitions. |
+| **Messaging** | **SQS (Simple Queue)**| Fully managed message queue for decoupling background tasks. | Message ordering requires FIFO queue (capped at 3,000 msg/sec). |
+| **Messaging** | **SNS (Notification)**| Pub/Sub fan-out message delivery to SQS, Email, HTTP endpoints. | No message persistence; messages dropped if subscriber offline. |
+| **Security**  | **KMS & Secrets Manager**| Envelope encryption key management & dynamic secret rotation. | KMS API throttling limits under extreme TPS spikes. |
+| **Monitoring**| **CloudWatch & GuardDuty**| Metrics, log aggregation & AI threat detection (VPC Flow Logs). | High log ingestion and retention cost at scale. |
+
 ---
 
 ## 💻 3. Production Code & Benchmarks
