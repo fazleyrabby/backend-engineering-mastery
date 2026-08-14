@@ -1,149 +1,121 @@
-# End-to-End System Execution: CPU, Memory, OS & How Code Runs
+# CPU, Memory, and OS Execution: First-Principles Mechanics
 
-> **Module:** CS Fundamentals (Topic 1.0)  
-> **Target:** Understanding every layer between hitting Enter on code/request and CPU execution.
+## 1. CPU Architecture & Execution Mechanics
 
----
+At the lowest level, the CPU operates on an fetch-decode-execute-store pipeline. Modern processors optimize this pipeline heavily using **branch prediction**, **speculative execution**, and **out-of-order execution**.
 
-## 🏛️ 1. The High-Level Hardware Architecture
+### Core Mechanics
+1. **Instruction Pipeline**: CPUs process instructions in stages. If a branch (e.g., `if-else`) is encountered, the CPU tries to predict the path (Branch Prediction) to avoid pipeline stalls. A misprediction costs ~15-20 CPU cycles as the pipeline is flushed.
+2. **CPU Caches (L1, L2, L3)**: Main memory (RAM) is painfully slow (~100ns). CPUs use SRAM caches.
+   - L1 Cache: Per core, ultra-fast (~1ns), divided into instruction (L1i) and data (L1d).
+   - L2 Cache: Per core, fast (~4ns).
+   - L3 Cache: Shared across all cores on a die, slower (~15ns), but much larger.
+3. **Cache Lines**: Data is fetched from memory in chunks called **Cache Lines** (typically 64 bytes). Modifying a single byte invalidates the entire 64-byte chunk across all other core caches (Cache Coherency via MESI protocol).
 
-```
-+-----------------------------------------------------------------------+
-|                                 CPU                                   |
-|  +------------------------+  +-------------------------------------+  |
-|  |     Control Unit       |  |     Arithmetic Logic Unit (ALU)     |  |
-|  +------------------------+  +-------------------------------------+  |
-|  | Registers (RAX, RBX..) |  | L1 Cache (32KB, ~1ns latency)       |  |
-|  +------------------------+  +-------------------------------------+  |
-|  | L2 Cache (512KB, ~3-5ns) | L3 Cache (Shared 16MB+, ~10-20ns)    |  |
-+-----------------------------------------------------------------------+
-                                  | System Bus
-                                  v
-+-----------------------------------------------------------------------+
-|                     RAM (Main Memory, ~60-100ns)                      |
-|  +------------------+  +------------------+  +---------------------+  |
-|  | Code / Text Seg  |  | Stack Memory     |  | Heap Memory         |  |
-|  +------------------+  +------------------+  +---------------------+  |
-+-----------------------------------------------------------------------+
-                                  | PCIe / NVMe Bus
-                                  v
-+-----------------------------------------------------------------------+
-|                    Disk / Storage (SSD NVMe ~100µs)                   |
-| (Source files, Database files, Compiled binaries, OS Kernel Image)    |
-+-----------------------------------------------------------------------+
-```
+### Real-World Production Example: LMAX Disruptor (Financial Trading)
+LMAX Exchange processes over 6 million transactions per second on a single thread. They achieved this by writing the **LMAX Disruptor**, a ring-buffer data structure that completely avoids locks and strictly adheres to mechanical sympathy (optimizing for CPU cache lines). 
+They avoided **False Sharing**—a scenario where two threads on different cores modify independent variables that happen to reside on the same 64-byte cache line, causing constant cache invalidations.
 
----
+### Code Snippet: False Sharing in Go
 
-## 🔬 2. From Source Code to Machine Instructions
+```go
+package main
 
-### Interpreted (PHP/Laravel) vs Compiled (C/Rust/Go)
+import (
+	"sync"
+	"testing"
+)
 
-1. **Compilation Phase (C/Go):**
-   `Source Code (.go/.c)` ➔ `Lexer/Parser` ➔ `Abstract Syntax Tree (AST)` ➔ `Intermediate Representation (IR)` ➔ `Machine Code (Binary Executable: ELF / Mach-O)`.
+// BadStruct suffers from false sharing.
+// Thread 1 updates A, Thread 2 updates B. Both are on the same cache line.
+type BadStruct struct {
+	A int64
+	B int64 
+}
 
-2. **JIT / Virtual Machine Phase (PHP / Laravel / Node.js):**
-   `PHP Source (.php)` ➔ `Zend Compiler` ➔ `Opcodes (Zend VM Instructions)` ➔ `Zend Engine execution (or JIT compilation to native assembly)`.
+// GoodStruct uses padding to ensure A and B are on separate 64-byte cache lines.
+type GoodStruct struct {
+	A int64
+	_ [56]byte // Padding (64 bytes - 8 bytes for int64)
+	B int64
+}
 
-### 💡 Detailed Code Example: What PHP Opcodes Look Like Under the Hood
+func BenchmarkFalseSharing(b *testing.B) {
+	s := &BadStruct{}
+	var wg sync.WaitGroup
+	wg.Add(2)
 
-When PHP runs this line of code:
-```php
-$a = 5;
-$b = 10;
-$c = $a + $b;
-```
+	// Thread 1
+	go func() {
+		for i := 0; i < b.N; i++ {
+			s.A++
+		}
+		wg.Done()
+	}()
 
-The Zend Engine compiles it into 4 low-level Virtual Machine Opcodes:
-
-```text
-line     #* E I O op                           fetch          ext  return  operands
--------------------------------------------------------------------------------------
-   3     0    ASSIGN                                                   $a, 5
-   4     1    ASSIGN                                                   $b, 10
-   5     2    ADD                                              ~2      $a, $b
-         3    ASSIGN                                                   $c, ~2
-   6     4    RETURN                                                   1
-```
-
----
-
-## 🧠 3. Memory Layout of a Running Process
-
-When the OS executes a program, it allocates Virtual Memory space divided into distinct segments:
-
-| Segment | Purpose | Lifetime | Growth Direction |
-| :--- | :--- | :--- | :--- |
-| **Text (Code)** | Executable machine assembly instructions (Read-Only) | Program execution | Static |
-| **Data / BSS** | Global variables, static variables | Program execution | Static |
-| **Heap** | Dynamically allocated memory (`malloc`, `new`, PHP objects) | Until freed / GC | Grows **Upward** (low to high address) |
-| **Stack** | Function call frames, local variables, return addresses | Scope of function | Grows **Downward** (high to low address) |
-
-### 💡 Concrete Code & Diagram: Stack vs Heap Allocation
-
-```php
-function processOrder(int $orderId): float 
-{
-    // $orderId & $taxRate are primitive values stored directly on the STACK
-    $taxRate = 0.15; 
-    
-    // $orderObject is an INSTANCE created on the HEAP! 
-    // The STACK only holds a 64-bit memory address pointer pointing to 0x7FFF82...
-    $orderObject = new Order($orderId); 
-    
-    return $orderObject->calculateTotal() * (1 + $taxRate);
+	// Thread 2
+	go func() {
+		for i := 0; i < b.N; i++ {
+			s.B++ // Causes L1 cache invalidation for Thread 1!
+		}
+		wg.Done()
+	}()
+	wg.Wait()
 }
 ```
 
-```
-STACK MEMORY (Fast 1-instruction pointer push)       HEAP MEMORY (Dynamic allocations)
-+------------------------------------------+          +----------------------------------+
-| Frame: processOrder()                    |          | Address: 0x7FFF8200              |
-| - $orderId: 42 (value)                   |          | Object: Order {                  |
-| - $taxRate: 0.15 (value)                 |          |   id: 42,                        |
-| - $orderObject: Pointer 0x7FFF8200 ------>|--------->|   status: 'pending',             |
-+------------------------------------------+          |   items: [ ... ]                 |
-                                                      | }                                |
-                                                      +----------------------------------+
-```
-
----
-
-## ⚡ 4. CPU Execution Cycle & Context Switching
-
-The CPU executes instructions via the **Fetch-Decode-Execute** cycle:
-
-1. **Fetch:** Program Counter (PC / RIP register) points to the next address in RAM/L1 Cache. CPU fetches the instruction byte.
-2. **Decode:** Control Unit decodes what action is required (e.g., `MOV`, `ADD`, `JMP`).
-3. **Execute:** ALU performs the math/logic or register manipulation.
-
-### Context Switch Overhead
-When the OS switches execution from Process A to Process B:
-- **Save State:** Registers (RIP, RSP, RAX...), CPU flags, and Page Table pointers saved to process Control Block (PCB).
-- **Restore State:** Load Process B's saved state into CPU.
-- **Cache Invalidation:** L1/L2 cache misses spike because CPU cache lines belong to Process A!
-
----
-
-## ⚔️ 5. Senior / Staff Technical Interview Scenarios
-
-### Q1: What happens under the hood when a function recursively calls itself infinitely?
-> **Answer:** Each function invocation pushes a new **Stack Frame** onto the stack (storing return address, arguments, and local variables). Because Stack memory is fixed size per thread (typically 2MB–8MB in OS defaults), continuous pushes without popping exhaust the memory limit, resulting in a **Stack Overflow (SIGSEGV / Segment Fault)**.
-
-### Q2: Why is accessing data from Heap slower than Stack memory?
-> **Answer:** 
-> 1. **Allocation Overhead:** Stack allocation is a single CPU instruction (pointer subtraction `RSP`). Heap allocation requires memory manager algorithms (finding free memory blocks, fragmentation handling).
-> 2. **Cache Locality:** Stack memory is contiguous and highly likely to reside in L1/L2 CPU caches. Heap memory spans arbitrary address ranges, causing higher L3/RAM latency and cache misses.
-
----
-
-## 🧪 Real-World Exploration Task
-
-Inspect the process memory breakdown on your Mac terminal for any process:
+### CLI Benchmark: Profiling Cache Misses with `perf`
 ```bash
-vmmap <PID>
+# Run the Go benchmark and attach Linux perf to measure cache misses
+go test -c
+perf stat -e cache-misses,cache-references,instructions,cycles ./your_binary -test.bench=.
+
+# Annotated Output:
+#  14,562,123      cache-references                                            
+#   9,421,051      cache-misses              # 64.695 % of all cache refs (False Sharing!)
+#  45,213,991      cycles                                                      
 ```
-Or run the benchmark script in this repository comparing Stack/Array vs Heap/Object allocations:
+
+## 2. Memory Management & The OS Kernel
+
+The OS abstract physical RAM using **Virtual Memory**. Every process thinks it has a contiguous, isolated block of memory. The CPU's **MMU (Memory Management Unit)** translates Virtual Addresses to Physical Addresses using Page Tables.
+
+### Translation Lookaside Buffer (TLB)
+Since Page Table walks are expensive (requiring memory access), the CPU caches recent translations in the TLB. A TLB miss means the CPU must pause, traverse the page table (often a 4-level deep radix tree in Linux), and find the physical address.
+
+### Page Faults
+When a virtual address maps to a page that isn't currently in physical RAM, the MMU triggers a **Page Fault** interrupt. The kernel takes over, fetches the page from disk (swap) or maps a zeroed page, and resumes the process.
+
+### Real-World Production Example: Redis BGSAVE & Copy-on-Write (CoW)
+Redis uses the `fork()` system call to create a child process for background persistence (BGSAVE). The child process initially shares the exact same physical memory as the parent (via Copy-on-Write). Only when the parent modifies a page does the OS duplicate it. 
+**Failure Mode:** If Redis handles heavy writes during a BGSAVE, CoW triggers massive memory duplication and page faults, leading to OOM (Out of Memory) crashes or severe latency spikes.
+
+### Mermaid Diagram: Virtual to Physical Memory Translation
+```mermaid
+flowchart TD
+    CPU["CPU (Instruction)"] -->|Virtual Address| MMU["MMU (Hardware)"]
+    MMU --> TLB["TLB (Translation Cache)"]
+    
+    TLB -- "Hit (Fast)" --> RAM["Physical RAM"]
+    TLB -- "Miss (Slow)" --> PageTable["Page Table (In RAM)"]
+    
+    PageTable -- "Present" --> RAM
+    PageTable -- "Not Present" --> PageFault["Page Fault (Kernel Interrupt)"]
+    PageFault --> Disk["Disk Swap / Storage"]
+```
+
+## 3. Senior/Staff Interview Q&A
+
+**Q: Why is a binary search sometimes slower than a linear search on a small array?**
+**A:** Branch prediction and cache locality. A linear search sequentially scans contiguous memory (perfect for CPU prefetching) and has predictable branching until the end. Binary search jumps around memory (cache misses) and has highly unpredictable branching (`if x < arr[mid]`), causing expensive CPU pipeline flushes.
+
+**Q: How do you tune Linux for a memory-intensive database like PostgreSQL?**
+**A:** Enable **Huge Pages**. Standard pages are 4KB. A 64GB RAM database requires 16 million page table entries, blowing out the TLB and causing constant TLB misses. By setting Linux to use 2MB or 1GB Huge Pages (`sysctl vm.nr_hugepages`), we drastically reduce the page table size and TLB misses.
+
 ```bash
-php sample-codes/02_eloquent_vs_db_benchmark.php
+# Check current Huge Page usage
+cat /proc/meminfo | grep Huge
+
+# Allocate 1024 huge pages (2MB each = 2GB total)
+sysctl -w vm.nr_hugepages=1024
 ```
