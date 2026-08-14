@@ -38,14 +38,16 @@ If a worker crashes mid-task, standard locks might deadlock. If a worker pauses 
 ```python
 import redis
 import uuid
+from typing import Any
 
-r = redis.Redis()
+# Initialize Redis client with type hints
+r: redis.Redis[Any] = redis.Redis()
 
 # Generate unique worker ID
-worker_id = str(uuid.uuid4())
+worker_id: str = str(uuid.uuid4())
 
 # 1. Acquire Lock (NX = Not Exists, PX = 30000ms expiration)
-acquired = r.set("resource_lock", worker_id, nx=True, px=30000)
+acquired: bool | None = r.set("resource_lock", worker_id, nx=True, px=30000)
 
 if acquired:
     try:
@@ -53,7 +55,7 @@ if acquired:
         pass
     finally:
         # 2. Safe Release via Atomic Lua Script
-        lua_script = """
+        lua_script: str = """
         if redis.call("get", KEYS[1]) == ARGV[1] then
             return redis.call("del", KEYS[1])
         else

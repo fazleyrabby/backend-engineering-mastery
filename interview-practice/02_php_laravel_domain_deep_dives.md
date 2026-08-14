@@ -1,4 +1,4 @@
-# Staff/Senior Laravel & Real-World Domain Interview Blueprint
+# Staff/Senior Python/FastAPI & Real-World Domain Interview Blueprint
 
 > **Module:** Interview Practice (Topic 6.2)  
 > **Source Mapping:** Experience at *Electronic First FZ LLE* & Portfolio Resume Analysis
@@ -11,7 +11,7 @@ Based on your 5+ years of experience at **Electronic First** and your portfolio:
 - You built a **Configurable Fraud Detection Engine** (IP, Card, Velocity, BIN/ASN validation, Risk scoring).
 - You integrated **Checkout.com, PayPal, Apple Pay, Google Pay, and Webhook-driven Dispute Sync**.
 - You engineered **ClickHouse OLAP analytics dashboards** for customer behavior & gateway performance.
-- You maintain a **Homelab with 41+ Docker containers, Traefik, FrankenPHP/Swoole, and Cloudflare Tunnels**.
+- You maintain a **Homelab with 41+ Docker containers, Traefik, Uvicorn/Gunicorn, and Cloudflare Tunnels**.
 
 ---
 
@@ -36,23 +36,23 @@ Based on your 5+ years of experience at **Electronic First** and your portfolio:
 
 ---
 
-## ⚡ 2. PHP & Laravel Framework Deep Interview Scenarios
+## ⚡ 2. Python & FastAPI/Django Framework Deep Interview Scenarios
 
-### Q4: Explain the internal differences between standard PHP-FPM, FrankenPHP, and Swoole/Octane.
+### Q4: Explain the internal differences between WSGI (Sync) and ASGI (Asyncio) application servers.
 > **Answer Strategy:**
-> - **PHP-FPM:** Spawns worker processes that parse scripts, allocate memory, process 1 request, and flush heap memory (`shared-nothing`).
-> - **FrankenPHP / Swoole (Octane):** Boots the Laravel application once into RAM memory. Operates as an event-driven persistent app server (using C/Go extensions and `epoll`). Zero boot latency per request (~5x-10x throughput boost).
+> - **WSGI (Gunicorn/Sync):** Spawns worker processes/threads that handle 1 request at a time, blocking on I/O operations (`synchronous`).
+> - **ASGI (Uvicorn/FastAPI):** Boots the application once into RAM. Operates as an event-driven persistent app server (using an event loop and `epoll`). Non-blocking I/O allows handling thousands of concurrent requests (~5x-10x throughput boost for I/O bound tasks).
 
-### Q5: What is the difference between Service Container `bind()`, `singleton()`, and `scoped()`?
+### Q5: What is the difference between Dependency Injection scopes: Transient, Singleton, and Request-Scoped (e.g., in FastAPI)?
 > **Answer Strategy:**
-> - `bind()`: Creates a new instance **every single time** the class is resolved.
-> - `singleton()`: Creates one instance that persists across the **entire lifecycle of the process**.
-> - `scoped()`: Creates one instance per **individual HTTP request** (crucial for Octane/Swoole so data doesn't leak between requests!).
+> - **Transient**: Creates a new instance **every single time** the dependency is resolved.
+> - **Singleton**: Creates one instance that persists across the **entire lifecycle of the application process**.
+> - **Request-Scoped**: Creates one instance per **individual HTTP request** (crucial for state like Database Sessions so data doesn't leak between concurrent requests!).
 
-### Q6: How does Eloquent handle model relationships under the hood (`hasMany`, `belongsTo`, `belongsToMany`)?
+### Q6: How does SQLAlchemy handle model relationships under the hood (`relationship`, `lazy='select'`, `lazy='joined'`)?
 > **Answer Strategy:**
-> - `hasMany`: Query Builder adds `WHERE foreign_key = primary_key`.
-> - `belongsToMany`: Uses a **Junction / Pivot Table** with `INNER JOIN` or 2-step `WHERE IN` queries.
+> - `lazy='select'`: Query Builder adds `WHERE foreign_key = primary_key` executing N+1 queries when accessed.
+> - `lazy='joined'`: Uses an `LEFT OUTER JOIN` to fetch the related object in the same query.
 
 ---
 
@@ -65,5 +65,5 @@ Based on your 5+ years of experience at **Electronic First** and your portfolio:
 
 ### Q8: How do you sync data from MySQL to ClickHouse in real-time?
 > **Answer Strategy:**
-> - **Option A (Batch Queue):** Laravel Queue jobs batch insert chunks (`10,000 rows`) into ClickHouse every minute (ClickHouse hates single-row `INSERT` statements).
+> - **Option A (Batch Queue):** Celery Queue jobs batch insert chunks (`10,000 rows`) into ClickHouse every minute (ClickHouse hates single-row `INSERT` statements).
 > - **Option B (CDC / Binlog):** Use Debezium / Kafka to stream MySQL binary logs into ClickHouse `ReplacingMergeTree` tables automatically.

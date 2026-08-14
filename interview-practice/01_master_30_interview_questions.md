@@ -19,17 +19,17 @@ In Staff & Senior Backend engineering interviews (and everyday engineering discu
 
 ## ⚔️ The 30 Core Questions & Answer Strategies
 
-### 1. Explain OOP and its four principles with examples from a Laravel application.
-> **Answer Strategy:** Define Encapsulation (Private model attributes/getters), Abstraction (Hiding HTTP calls inside a Service class), Inheritance (Base FormRequest class), and Polymorphism (Injecting `PaymentGatewayInterface` with `Stripe` or `PayPal` implementations).
+### 1. Explain OOP and its four principles with examples from a Python application.
+> **Answer Strategy:** Define Encapsulation (Private model attributes/getters), Abstraction (Hiding HTTP calls inside a Service class), Inheritance (Base BaseModel class), and Polymorphism (Injecting `PaymentGatewayInterface` with `Stripe` or `PayPal` implementations).
 
 ### 2. Explain SOLID and give an example where violating one creates a real problem.
 > **Answer Strategy:** Mention OCP (Open/Closed) or DIP (Dependency Inversion). Example: A `PaymentController` with a massive `switch($provider)` statement. Adding a new provider forces modifying existing controller code, risking regressions on existing payment providers.
 
 ### 3. What problem does dependency injection solve?
-> **Answer Strategy:** Removes hard-coded dependencies (`$db = new Database()`), enabling loose coupling, easier unit testing with mock objects (`PaymentGateway::fake()`), and runtime flexibility.
+> **Answer Strategy:** Removes hard-coded dependencies (`db = Database()`), enabling loose coupling, easier unit testing with mock objects (`mock.Mock(spec=PaymentGateway)`), and runtime flexibility.
 
-### 4. What happens when a browser sends a request to a Laravel application?
-> **Answer Strategy:** Trace `index.php` ➔ Composer autoloader ➔ Service Provider registration & booting ➔ HTTP Kernel global middleware ➔ Router ➔ Route middleware ➔ Controller resolution ➔ Response termination.
+### 4. What happens when a browser sends a request to a FastAPI/Django application?
+> **Answer Strategy:** Trace ASGI/WSGI server ➔ App initialization ➔ Middleware stack ➔ Router ➔ Path Operation/View ➔ Dependency Injection resolution ➔ Response generation.
 
 ### 5. What happens when you enter https://example.com in a browser?
 > **Answer Strategy:** DNS lookup (browser cache ➔ OS ➔ Resolver ➔ Authoritative DNS) ➔ TCP 3-way handshake (SYN, SYN-ACK, ACK) ➔ TLS 1.3 handshake ➔ HTTP GET request ➔ Server response ➔ DOM parsing & rendering.
@@ -56,7 +56,7 @@ In Staff & Senior Backend engineering interviews (and everyday engineering discu
 > **Answer Strategy:** Read Uncommitted (Dirty reads), Read Committed (Non-repeatable reads), Repeatable Read (Default InnoDB; Gap locks prevent phantom reads), Serializable (Strict locking).
 
 ### 13. Give a real-world example of a race condition.
-> **Answer Strategy:** E-commerce stock subtraction: 2 users read `$stock = 1` simultaneously. Both check `$stock > 0` (true) and both write `$stock - 1 = 0`. Stock becomes -1 (oversold).
+> **Answer Strategy:** E-commerce stock subtraction: 2 users read `stock = 1` simultaneously. Both check `stock > 0` (true) and both write `stock - 1 = 0`. Stock becomes -1 (oversold).
 
 ### 14. Two users try to buy the last product simultaneously. How do you prevent overselling?
 > **Answer Strategy:**
@@ -91,7 +91,7 @@ In Staff & Senior Backend engineering interviews (and everyday engineering discu
 > **Answer Strategy:** Decouples heavy I/O operations (sending emails, processing images) from the HTTP request/response cycle, dropping API response times from 3s to 20ms.
 
 ### 23. How do you make a queue job safe to retry?
-> **Answer Strategy:** Ensure job handlers are idempotent (e.g. check if `$order->status === 'paid'` before sending receipt email).
+> **Answer Strategy:** Ensure job handlers are idempotent (e.g. check if `order.status == 'paid'` before sending receipt email).
 
 ### 24. What is the difference between a cache and a database?
 > **Answer Strategy:** Cache (Redis) stores transient data in RAM for sub-millisecond reads. Database (MySQL) stores persistent data on Disk with ACID guarantees.
@@ -99,8 +99,8 @@ In Staff & Senior Backend engineering interviews (and everyday engineering discu
 ### 25. What causes cache invalidation problems?
 > **Answer Strategy:** Stale data when DB is updated without invalidating cache keys, race conditions between concurrent writes, or lack of proper cache key versioning (`users:1:v2`).
 
-### 26. How would you design a Laravel application that handles 10x today's traffic?
-> **Answer Strategy:** Make application stateless ➔ Scale worker nodes horizontally behind Nginx load balancer ➔ Introduce Redis caching (Cache-Aside) ➔ Add Read Replicas for MySQL ➔ Offload heavy work to Horizon queue workers.
+### 26. How would you design a Python application that handles 10x today's traffic?
+> **Answer Strategy:** Make application stateless ➔ Scale worker nodes horizontally behind Nginx load balancer ➔ Introduce Redis caching (Cache-Aside) ➔ Add Read Replicas for MySQL ➔ Offload heavy work to Celery queue workers.
 
 ### 27. Monolith vs microservices — when would you choose each?
 > **Answer Strategy:** Choose Monolith/Modular Monolith for small-to-medium teams for low operational complexity and single DB ACID transactions. Choose Microservices when scaling engineering team size (>50-100 devs) across independent domain boundaries.

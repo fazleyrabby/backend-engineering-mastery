@@ -66,33 +66,31 @@ Stripe sends millions of webhooks to clients. To prevent slow clients (who accep
 
 ## 4. Code & CLI Benchmarks
 
-### Code Snippet: Go HTTP Client with Deep TCP Tuning
-```go
-package main
+### Code Snippet: Python HTTP Client with Deep TCP Tuning
+```python
+import socket
+import urllib3
+from urllib3.util.retry import Retry
 
-import (
-	"context"
-	"net"
-	"net/http"
-	"time"
-)
+def create_tuned_client() -> urllib3.PoolManager:
+    # Python's urllib3 allows advanced socket-level tuning via socket_options
+    # and connection pooling mechanics similar to Go's http.Transport
+    
+    # TCP Keep-Alive tuning options (OS specific, values shown for Linux)
+    socket_options = [
+        (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
+        (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 30), # Keep-Alive probes after 30s
+        (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 10),
+        (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 3),
+    ]
 
-func createTunedClient() *http.Client {
-	return &http.Client{
-		Timeout: 5 * time.Second, // Global timeout (DNS + TCP + TLS + HTTP processing)
-		Transport: &http.Transport{
-			DialContext: (&net.Dialer{
-				Timeout:   1 * time.Second,  // Max time for TCP handshake
-				KeepAlive: 30 * time.Second, // TCP Keep-Alive probes
-			}).DialContext,
-			ForceAttemptHTTP2:     true,
-			MaxIdleConns:          100, // Connection pooling (reusing TCP/TLS setup)
-			IdleConnTimeout:       90 * time.Second,
-			TLSHandshakeTimeout:   1 * time.Second,
-			ExpectContinueTimeout: 1 * time.Second,
-		},
-	}
-}
+    return urllib3.PoolManager(
+        num_pools=10,
+        maxsize=100, # Connection pooling (reusing TCP/TLS setup)
+        timeout=urllib3.Timeout(connect=1.0, read=4.0), # Max time for TCP handshake & HTTP read
+        socket_options=socket_options,
+        retries=Retry(total=3, backoff_factor=0.5)
+    )
 ```
 
 ### CLI Benchmark: Packet Analysis with `tcpdump` and `ss`

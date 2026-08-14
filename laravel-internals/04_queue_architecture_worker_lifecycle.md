@@ -37,45 +37,35 @@ sequenceDiagram
 
 At scale (like GitHub processing pushes or Netflix transcoding), a single queue is inefficient. Jobs are segmented into high, default, and low priority queues. Worker clusters scale based on queue depth (using tools like KEDA in Kubernetes).
 
-### Production Code Snippet (PHP 8.2+)
+### Production Code Snippet (Python 3.11+ & Celery)
 
-```php
-namespace App\Jobs;
+```python
+import logging
+from celery import Task
+from celery.app import shared_task
+from app.models import Video
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use App\Models\Video;
-use Illuminate\Support\Facades\Log;
+# Celery implicitly serializes/deserializes IDs. We fetch the model in the task.
 
-class TranscodeVideoJob implements ShouldQueue
-{
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    // 1. Retry strategy: Max 3 attempts
-    public int $tries = 3;
+@shared_task(
+    bind=True, 
+    # 1. Retry strategy: Max 3 attempts
+    max_retries=3,
+    # 2. Memory safety: Hard time limit (raises TimeLimitExceeded)
+    time_limit=120
+)
+def transcode_video_job(self: Task, video_id: int) -> None:
+    # Worker needs to fetch fresh model data (similar to SerializesModels)
+    video = Video.query.get(video_id)
     
-    // 2. Memory safety: Release back to queue if it takes > 120s
-    public int $timeout = 120;
-
-    public function __construct(
-        public readonly Video $video
-    ) {}
-
-    public function handle(): void
-    {
-        // 3. Process intensive task
-        Log::info("Transcoding started for video: {$this->video->id}");
-        
-        // Simulating memory intensive task
-        $buffer = str_repeat('A', 1024 * 1024 * 50); // 50MB allocation
-        
-        // 4. Manual unset to help PHP Garbage Collector in long-lived worker
-        unset($buffer);
-    }
-}
+    # 3. Process intensive task
+    logging.info(f"Transcoding started for video: {video.id}")
+    
+    # Simulating memory intensive task
+    buffer = "A" * (1024 * 1024 * 50) # 50MB allocation
+    
+    # 4. Manual deletion to help Python Garbage Collector in long-lived worker process
+    del buffer
 ```
 
 ---

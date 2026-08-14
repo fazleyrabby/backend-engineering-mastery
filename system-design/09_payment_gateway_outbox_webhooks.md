@@ -29,42 +29,39 @@ classDiagram
 
 ### Production Code: The Adapter Pattern (Go)
 
-```go
-package payment
+```python
+import asyncio
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from typing import Optional
 
-import (
-	"context"
-	"errors"
-	"time"
-)
+# PaymentRequest abstracts the provider-specific payload
+@dataclass
+class PaymentRequest:
+    amount_cents: int
+    currency: str
+    source_token: str
+    order_id: str
 
-// PaymentRequest abstracts the provider-specific payload
-type PaymentRequest struct {
-	AmountCents int
-	Currency    string
-	SourceToken string
-	OrderID     string
-}
+# Gateway defines the standard contract
+class Gateway(ABC):
+    @abstractmethod
+    async def charge(self, req: PaymentRequest) -> str:
+        pass
 
-// Gateway defines the standard contract
-type Gateway interface {
-	Charge(ctx context.Context, req PaymentRequest) (string, error)
-}
+# StripeAdapter implements Gateway
+class StripeAdapter(Gateway):
+    def __init__(self, api_key: str):
+        self.api_key = api_key
 
-// StripeAdapter implements Gateway
-type StripeAdapter struct {
-	APIKey string
-}
-
-func (s *StripeAdapter) Charge(ctx context.Context, req PaymentRequest) (string, error) {
-	// Implement strict timeouts! External network calls must bound their latency.
-	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
-	defer cancel()
-
-	// ... execute HTTP POST to Stripe ...
-	// returning hypothetical transaction ID
-	return "ch_12345stripe", nil
-}
+    async def charge(self, req: PaymentRequest) -> str:
+        # Implement strict timeouts! External network calls must bound their latency.
+        async with asyncio.timeout(3.0):
+            # ... execute HTTP POST to Stripe ...
+            await asyncio.sleep(0.5) # Simulate network call
+            
+            # returning hypothetical transaction ID
+            return "ch_12345stripe"
 ```
 
 ---

@@ -38,41 +38,46 @@ sequenceDiagram
 
 In high-throughput environments like Stripe or scaling e-commerce platforms, injecting thousands of objects per request cycle via reflection creates severe CPU overhead. Octane (Swoole/FrankenPHP) solves this by booting the framework once into RAM. 
 
-### Production Code Snippet (PHP 8.2+)
+### Production Code Snippet (Python 3.11+ & FastAPI)
 
-```php
-namespace App\Http\Controllers;
+```python
+from fastapi import APIRouter, Depends
+from typing import Annotated
 
-use App\Contracts\PaymentGatewayInterface;
-use App\Services\OrderService;
-use Illuminate\Http\JsonResponse;
+# Contracts / Interfaces
+class PaymentGatewayInterface:
+    pass
 
-class CheckoutController extends Controller
-{
-    // 1. Constructor Property Promotion (PHP 8.0+)
-    public function __construct(
-        protected readonly OrderService $orderService,
-        protected readonly PaymentGatewayInterface $gateway
-    ) {}
+class StripeGateway(PaymentGatewayInterface):
+    def __init__(self, secret_key: str):
+        self.secret_key = secret_key
 
-    public function process(string $orderId): JsonResponse 
-    {
-        // 2. Process order via the injected service
-        $status = $this->orderService->process($orderId, $this->gateway);
-        
-        return response()->json(['status' => $status]);
-    }
-}
+class OrderService:
+    def process(self, order_id: str, gateway: PaymentGatewayInterface) -> str:
+        return "processed"
 
-// AppServiceProvider.php - Binding interfaces to concretes safely in Octane
-public function register(): void
-{
-    // 3. Use scoped binding for user-specific context to prevent memory leaks in Octane
-    $this->app->scoped(PaymentGatewayInterface::class, function ($app) {
-        // Safe instantiation per request, discarded after response
-        return new StripeGateway(config('services.stripe.secret'));
-    });
-}
+# Dependency Injection Providers
+def get_payment_gateway() -> PaymentGatewayInterface:
+    # 3. Safe instantiation per request, discarded after response
+    # This prevents memory leaks in persistent runtimes like Uvicorn/Gunicorn
+    return StripeGateway(secret_key="sk_live_...")
+
+def get_order_service() -> OrderService:
+    return OrderService()
+
+router = APIRouter()
+
+@router.post("/checkout/{order_id}")
+async def process_checkout(
+    order_id: str,
+    # 1. Dependency injection for request lifecycle (FastAPI Depends)
+    order_service: Annotated[OrderService, Depends(get_order_service)],
+    gateway: Annotated[PaymentGatewayInterface, Depends(get_payment_gateway)]
+) -> dict[str, str]:
+    # 2. Process order via the injected service
+    status = order_service.process(order_id, gateway)
+    
+    return {"status": status}
 ```
 
 ---
@@ -115,19 +120,22 @@ Running 30s test @ http://localhost:8000/api/checkout/123
 In traditional **PHP-FPM**, memory is flushed completely after every HTTP response. In **Laravel Octane**, the application stays booted in RAM across 100,000+ requests.
 
 **Failure Mode (Cross-User Data Bleed):**
-```php
-class InvoiceCalculator 
-{
-    // FATAL FLAW: STATIC PROPERTY PERSISTS IN RAM FOREVER ACROSS REQUESTS!
-    protected static array $cachedTaxes = [];
+```python
+from pydantic import BaseModel
 
-    public function calculate(Order $order): float 
-    {
-        // User A's tax rate gets stored in RAM. User B can access it if ID matches!
-        self::$cachedTaxes[$order->id] = $order->tax_rate; 
-        return $order->amount * self::$cachedTaxes[$order->id];
-    }
-}
+class Order(BaseModel):
+    id: str
+    tax_rate: float
+    amount: float
+
+class InvoiceCalculator:
+    # FATAL FLAW: CLASS ATTRIBUTE PERSISTS IN RAM FOREVER ACROSS REQUESTS (Uvicorn/Gunicorn)!
+    _cached_taxes: dict[str, float] = {}
+
+    def calculate(self, order: Order) -> float:
+        # User A's tax rate gets stored in RAM. User B can access it if ID matches!
+        self._cached_taxes[order.id] = order.tax_rate 
+        return order.amount * self._cached_taxes[order.id]
 ```
 
 **Mitigation:** Use Octane's `Tick` listeners to reset static state, or strictly use `scoped()` DI bindings.

@@ -39,44 +39,45 @@ flowchart TD
 ### Sliding Window Velocity Check (Redis ZSET)
 Velocity checks measure how many times a user/IP/Card tried to buy in the last N minutes. We use Redis Sorted Sets (`ZSET`) where the score is the timestamp.
 
-```php
-<?php
-namespace App\Services\Fraud\Rules;
+```python
+import time
+import uuid
+from redis.asyncio import Redis
 
-use Illuminate\Support\Facades\Redis;
+class VelocityCheckRule:
+    def __init__(self, redis: Redis):
+        self.redis = redis
 
-class VelocityCheckRule 
-{
-    /**
-     * Checks if an IP has attempted too many transactions in the last hour.
-     * Time Complexity: O(log(N) + M) in Redis, incredibly fast.
-     */
-    public function calculateRisk(string $ipAddress): int 
-    {
-        $key = "fraud:velocity:ip:" . $ipAddress;
-        $now = time();
-        $windowStart = $now - 3600; // 1 hour window
+    async def calculate_risk(self, ip_address: str) -> int:
+        """
+        Checks if an IP has attempted too many transactions in the last hour.
+        Time Complexity: O(log(N) + M) in Redis, incredibly fast.
+        """
+        key = f"fraud:velocity:ip:{ip_address}"
+        now = time.time()
+        window_start = now - 3600 # 1 hour window
 
-        // 1. Add current timestamp to Redis Sorted Set
-        // Score = timestamp, Value = timestamp + random to ensure uniqueness
-        Redis::zadd($key, $now, $now . '_' . uniqid());
+        # 1. Add current timestamp to Redis Sorted Set
+        # Score = timestamp, Value = timestamp + random to ensure uniqueness
+        member = f"{now}_{uuid.uuid4().hex}"
+        await self.redis.zadd(key, {member: now})
         
-        // 2. Remove entries older than 1 hour to maintain the sliding window
-        Redis::zremrangebyscore($key, '-inf', $windowStart);
+        # 2. Remove entries older than 1 hour to maintain the sliding window
+        await self.redis.zremrangebyscore(key, "-inf", window_start)
         
-        // 3. Count remaining transactions in the window
-        $count = Redis::zcard($key);
+        # 3. Count remaining transactions in the window
+        count = await self.redis.zcard(key)
         
-        // 4. Auto-expire the key to save memory
-        Redis::expire($key, 3600);
+        # 4. Auto-expire the key to save memory
+        await self.redis.expire(key, 3600)
 
-        // 5. Evaluate Risk
-        if ($count > 10) return 100; // Extreme velocity -> Auto Block
-        if ($count > 5) return 40;   // Suspicious -> Challenge via 3DS2
-        
-        return 0; // Safe
-    }
-}
+        # 5. Evaluate Risk
+        if count > 10:
+            return 100 # Extreme velocity -> Auto Block
+        if count > 5:
+            return 40  # Suspicious -> Challenge via 3DS2
+            
+        return 0 # Safe
 ```
 
 ### Deep Mechanics (Redis Memory & CPU)

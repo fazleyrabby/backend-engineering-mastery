@@ -44,46 +44,38 @@ sequenceDiagram
 
 ### Production Go Implementation
 
-```go
-package main
+```python
+import asyncio
+import time
+from typing import Optional
+from redis.asyncio import Redis
 
-import (
-	"context"
-	"fmt"
-	"time"
-	"github.com/go-redis/redis/v8"
-)
+# ProcessPayment ensures idempotency using Redis SETNX
+async def process_payment(rdb: Redis, idempotency_key: str, payload: str) -> str:
+    key = f"idemp:{idempotency_key}"
+    
+    # 1. Try to acquire the lock / check if already processed
+    # nx=True: Only set if it doesn't exist, ex=86400: Expire in 24 hours
+    is_set = await rdb.set(key, "PROCESSING", nx=True, ex=86400)
+    
+    if not is_set:
+        # Key exists, fetch the current state
+        val: Optional[bytes] = await rdb.get(key)
+        
+        if val == b"PROCESSING":
+            raise ValueError("HTTP 409: Concurrent request processing")
+            
+        # Return the cached result
+        return val.decode("utf-8") if val else ""
 
-var ctx = context.Background()
-
-// ProcessPayment ensures idempotency using Redis SETNX
-func ProcessPayment(rdb *redis.Client, idempotencyKey string, payload string) (string, error) {
-	// 1. Try to acquire the lock / check if already processed
-	// NX: Only set if it doesn't exist, EX: Expire in 24 hours
-	set, err := rdb.SetNX(ctx, "idemp:"+idempotencyKey, "PROCESSING", 24*time.Hour).Result()
-	if err != nil {
-		return "", err
-	}
-	
-	if !set {
-		// Key exists, fetch the current state
-		val, _ := rdb.Get(ctx, "idemp:"+idempotencyKey).Result()
-		if val == "PROCESSING" {
-			return "", fmt.Errorf("HTTP 409: Concurrent request processing")
-		}
-		// Return the cached result
-		return val, nil
-	}
-
-	// 2. Perform the actual database operation (omitted)
-	time.Sleep(100 * time.Millisecond) // Simulate DB I/O
-	
-	// 3. Store the final successful payload
-	finalPayload := `{"status":"SUCCESS", "tx_id":"12345"}`
-	rdb.Set(ctx, "idemp:"+idempotencyKey, finalPayload, 24*time.Hour)
-	
-	return finalPayload, nil
-}
+    # 2. Perform the actual database operation (omitted)
+    await asyncio.sleep(0.1) # Simulate DB I/O
+    
+    # 3. Store the final successful payload
+    final_payload = '{"status":"SUCCESS", "tx_id":"12345"}'
+    await rdb.set(key, final_payload, ex=86400)
+    
+    return final_payload
 ```
 
 ### CLI Benchmark: Redis `SETNX` Throughput

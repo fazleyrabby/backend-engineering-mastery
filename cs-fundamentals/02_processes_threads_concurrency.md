@@ -26,33 +26,28 @@ To safely share memory across threads, we use synchronization.
 - **Spinlock**: Thread B loops infinitely checking if the lock is free. Burns CPU, but avoids the expensive context switch of going to sleep. Useful only for *very* short critical sections.
 - **Waitgroup / CountDownLatch**: Synchronization barrier that waits for N operations to complete.
 
-### Code Snippet: Go Mutex vs RWMutex
-```go
-package main
+### Code Snippet: Python Lock vs RWLock (Conceptual)
+```python
+import threading
+from typing import Any
 
-import (
-	"sync"
-	"time"
-)
+# A standard Lock blocks EVERYONE else (readers and writers)
+mu = threading.Lock()
 
-// A standard Mutex blocks EVERYONE else (readers and writers)
-var mu sync.Mutex
+# Note: Python's standard library doesn't have a built-in RWMutex.
+# In practice, you'd use a 3rd party library like `readerwriterlock` or 
+# implement your own via threading.Condition. Here's the conceptual usage:
+# rw = ReaderWriterLock()
+data: int = 0
 
-// An RWMutex allows MULTIPLE readers simultaneously, but only ONE writer
-var rw sync.RWMutex
-var data int
+def read_data_rw_mutex(rw: Any) -> int:
+    with rw.gen_rlock(): # Multiple threads can acquire this lock concurrently!
+        return data
 
-func ReadDataRWMutex() int {
-	rw.RLock() // Multiple threads can acquire this lock concurrently!
-	defer rw.RUnlock()
-	return data
-}
-
-func WriteDataRWMutex(val int) {
-	rw.Lock() // Blocks all readers AND writers
-	defer rw.Unlock()
-	data = val
-}
+def write_data_rw_mutex(rw: Any, val: int) -> None:
+    with rw.gen_wlock(): # Blocks all readers AND writers
+        global data
+        data = val
 ```
 
 ### CLI Benchmark: Monitoring Context Switches
@@ -80,16 +75,18 @@ Python (CPython) uses reference counting for garbage collection. To make this th
 ```python
 import threading
 
-def cpu_bound_task():
+def cpu_bound_task() -> None:
     count = 0
-    for i in range(10**7):
+    for _ in range(10**7):
         count += 1
 
 # Even with 4 threads on a 4-core machine, this will take exactly as long 
 # as running them sequentially on 1 core because of the GIL!
-threads = [threading.Thread(target=cpu_bound_task) for _ in range(4)]
-for t in threads: t.start()
-for t in threads: t.join()
+threads: list[threading.Thread] = [threading.Thread(target=cpu_bound_task) for _ in range(4)]
+for t in threads:
+    t.start()
+for t in threads:
+    t.join()
 ```
 *Fix for Python:* Use `multiprocessing` (spawns separate OS processes) for CPU-bound tasks, or use threads strictly for I/O-bound tasks (where the GIL is released during `recv()`/`send()`).
 

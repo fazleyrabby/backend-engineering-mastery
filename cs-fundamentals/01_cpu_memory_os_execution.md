@@ -16,59 +16,56 @@ At the lowest level, the CPU operates on an fetch-decode-execute-store pipeline.
 LMAX Exchange processes over 6 million transactions per second on a single thread. They achieved this by writing the **LMAX Disruptor**, a ring-buffer data structure that completely avoids locks and strictly adheres to mechanical sympathy (optimizing for CPU cache lines). 
 They avoided **False Sharing**—a scenario where two threads on different cores modify independent variables that happen to reside on the same 64-byte cache line, causing constant cache invalidations.
 
-### Code Snippet: False Sharing in Go
+### Code Snippet: False Sharing in Python
 
-```go
-package main
+```python
+import multiprocessing
+import ctypes
 
-import (
-	"sync"
-	"testing"
-)
+# BadStruct conceptually suffers from false sharing.
+# Process 1 updates A, Process 2 updates B. Both are on the same cache line.
+class BadStruct(ctypes.Structure):
+    _fields_ = [
+        ("A", ctypes.c_longlong),
+        ("B", ctypes.c_longlong)
+    ]
 
-// BadStruct suffers from false sharing.
-// Thread 1 updates A, Thread 2 updates B. Both are on the same cache line.
-type BadStruct struct {
-	A int64
-	B int64 
-}
+# GoodStruct uses padding to ensure A and B are on separate 64-byte cache lines.
+class GoodStruct(ctypes.Structure):
+    _fields_ = [
+        ("A", ctypes.c_longlong),
+        ("_padding", ctypes.c_byte * 56), # Padding (64 bytes - 8 bytes for int64)
+        ("B", ctypes.c_longlong)
+    ]
 
-// GoodStruct uses padding to ensure A and B are on separate 64-byte cache lines.
-type GoodStruct struct {
-	A int64
-	_ [56]byte // Padding (64 bytes - 8 bytes for int64)
-	B int64
-}
+def worker_a(shared_struct: multiprocessing.Value, iterations: int) -> None:
+    for _ in range(iterations):
+        shared_struct.A += 1
 
-func BenchmarkFalseSharing(b *testing.B) {
-	s := &BadStruct{}
-	var wg sync.WaitGroup
-	wg.Add(2)
+def worker_b(shared_struct: multiprocessing.Value, iterations: int) -> None:
+    for _ in range(iterations):
+        shared_struct.B += 1  # Causes L1 cache invalidation for worker_a!
 
-	// Thread 1
-	go func() {
-		for i := 0; i < b.N; i++ {
-			s.A++
-		}
-		wg.Done()
-	}()
+def benchmark_false_sharing() -> None:
+    # Allocate in shared memory to bypass GIL and use multiple CPU cores
+    s = multiprocessing.Value(BadStruct)
+    iterations = 10_000_000
 
-	// Thread 2
-	go func() {
-		for i := 0; i < b.N; i++ {
-			s.B++ // Causes L1 cache invalidation for Thread 1!
-		}
-		wg.Done()
-	}()
-	wg.Wait()
-}
+    p1 = multiprocessing.Process(target=worker_a, args=(s, iterations))
+    p2 = multiprocessing.Process(target=worker_b, args=(s, iterations))
+
+    p1.start()
+    p2.start()
+
+    p1.join()
+    p2.join()
 ```
 
 ### CLI Benchmark: Profiling Cache Misses with `perf`
 ```bash
-# Run the Go benchmark and attach Linux perf to measure cache misses
-go test -c
-perf stat -e cache-misses,cache-references,instructions,cycles ./your_binary -test.bench=.
+# Run the Python script and attach Linux perf to measure cache misses
+python -c 'import benchmark; benchmark.benchmark_false_sharing()' &
+perf stat -e cache-misses,cache-references,instructions,cycles -p $!
 
 # Annotated Output:
 #  14,562,123      cache-references                                            

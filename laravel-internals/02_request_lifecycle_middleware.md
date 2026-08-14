@@ -50,23 +50,30 @@ Laravel constructs the pipeline using `array_reduce`. Internally, each middlewar
 
 ## 💻 3. Production Code & Benchmarks
 
-### Custom Pipeline Implementation (C/PHP equivalent)
+### Custom Pipeline Implementation (Pure Python equivalent)
 
-```php
-// Core implementation of the pipeline pattern
-$pipeline = array_reduce(
-    array_reverse($middlewares),
-    function ($next, $middleware) {
-        return function ($request) use ($next, $middleware) {
-            return (new $middleware)->handle($request, $next);
-        };
-    },
-    function ($request) {
-        return (new Controller)->dispatch($request);
-    }
-);
+```python
+from typing import Callable, Any
 
-$response = $pipeline($request);
+# Core implementation of the pipeline pattern (ASGI / Onion style)
+def build_pipeline(middlewares: list[type], controller_action: Callable) -> Callable:
+    # Start with the innermost controller execution
+    pipeline = controller_action
+    
+    # Wrap with middlewares from inside out using closures
+    for middleware_class in reversed(middlewares):
+        middleware_instance = middleware_class()
+        
+        # We capture the current pipeline state as 'next_call'
+        def wrap(request: Any, next_call: Callable = pipeline, m=middleware_instance) -> Any:
+            return m.handle(request, next_call)
+            
+        pipeline = wrap
+        
+    return pipeline
+
+# Execution
+# response = build_pipeline(middlewares, controller_dispatch)(request)
 ```
 
 ### Benchmarks (Req/Sec)

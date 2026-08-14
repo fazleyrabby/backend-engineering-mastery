@@ -55,39 +55,58 @@ flowchart TD
 ## 💻 3. Production Code & Benchmarks
 
 ### Node.js WebSocket + Redis PubSub implementation
-```javascript
-const WebSocket = require('ws');
-const Redis = require('ioredis');
+```python
+import asyncio
+import json
+import os
+from typing import Any
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+import redis.asyncio as redis
 
-const wss = new WebSocket.Server({ port: 8080 });
-const redisSub = new Redis(process.env.REDIS_URL);
-const redisPub = new Redis(process.env.REDIS_URL);
+app = FastAPI()
+# Local memory map of userId -> WebSocket instance
+clients: dict[str, WebSocket] = {}
 
-// Local memory map of userId -> WebSocket instance
-const clients = new Map();
+redis_url = os.getenv("REDIS_URL", "redis://localhost")
+redis_pub = redis.from_url(redis_url)
+redis_sub = redis.from_url(redis_url)
 
-wss.on('connection', (ws, req) => {
-    // Authenticate and get User ID (simplified)
-    const userId = getUserIdFromRequest(req);
-    clients.set(userId, ws);
+async def get_user_id_from_request(websocket: WebSocket) -> str:
+    # Authenticate and get User ID (simplified)
+    return "user_123"
 
-    ws.on('message', (msg) => {
-        // Broadcast to Redis backplane
-        redisPub.publish('chat', JSON.stringify({ sender: userId, data: msg }));
-    });
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    user_id = await get_user_id_from_request(websocket)
+    clients[user_id] = websocket
 
-    ws.on('close', () => clients.delete(userId));
-});
+    try:
+        while True:
+            msg = await websocket.receive_text()
+            # Broadcast to Redis backplane
+            await redis_pub.publish(
+                "chat", 
+                json.dumps({"sender": user_id, "data": msg})
+            )
+    except WebSocketDisconnect:
+        clients.pop(user_id, None)
 
-// Listen to Redis Backplane
-redisSub.subscribe('chat');
-redisSub.on('message', (channel, message) => {
-    const payload = JSON.parse(message);
-    // Push only to users physically connected to THIS process
-    for (const [id, ws] of clients.entries()) {
-        if (ws.readyState === WebSocket.OPEN) ws.send(payload.data);
-    }
-});
+async def listen_to_redis_backplane():
+    pubsub = redis_sub.pubsub()
+    await pubsub.subscribe("chat")
+    async for message in pubsub.listen():
+        if message["type"] == "message":
+            payload: dict[str, Any] = json.loads(message["data"])
+            
+            # Push only to users physically connected to THIS process
+            for client_id, ws in clients.items():
+                if ws.client_state == 1: # WebSocket.OPEN
+                    await ws.send_text(payload["data"])
+
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(listen_to_redis_backplane())
 ```
 
 ### Exact CLI Benchmark Command (`tsung` or `thor`)

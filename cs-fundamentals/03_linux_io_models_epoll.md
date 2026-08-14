@@ -35,41 +35,45 @@ To solve this, the OS provides **I/O Multiplexing**. A single thread can ask the
 import socket
 import select
 
-# 1. Create a non-blocking TCP server
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-server.bind(('0.0.0.0', 8080))
-server.listen()
-server.setblocking(False)
+def main() -> None:
+    # 1. Create a non-blocking TCP server
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server.bind(('0.0.0.0', 8080))
+    server.listen()
+    server.setblocking(False)
 
-# 2. Create the epoll object
-epoll = select.epoll()
-# Register the server socket to listen for incoming connections (EPOLLIN)
-epoll.register(server.fileno(), select.EPOLLIN)
+    # 2. Create the epoll object
+    epoll = select.epoll()
+    # Register the server socket to listen for incoming connections (EPOLLIN)
+    epoll.register(server.fileno(), select.EPOLLIN)
 
-connections = {}
+    connections: dict[int, socket.socket] = {}
 
-print("Listening on port 8080 (epoll loop)...")
-while True:
-    # 3. Block until AT LEAST ONE event occurs on registered file descriptors (O(1))
-    events = epoll.poll(1)
-    
-    for fileno, event in events:
-        if fileno == server.fileno():
-            # New connection!
-            conn, addr = server.accept()
-            conn.setblocking(False)
-            epoll.register(conn.fileno(), select.EPOLLIN)
-            connections[conn.fileno()] = conn
-        elif event & select.EPOLLIN:
-            # Data ready to read!
-            data = connections[fileno].recv(1024)
-            if data:
-                connections[fileno].send(b"HTTP/1.1 200 OK\r\n\r\nHello!")
-            else:
-                epoll.unregister(fileno)
-                connections[fileno].close()
-                del connections[fileno]
+    print("Listening on port 8080 (epoll loop)...")
+    while True:
+        # 3. Block until AT LEAST ONE event occurs on registered file descriptors (O(1))
+        events = epoll.poll(1)
+        
+        for fileno, event in events:
+            if fileno == server.fileno():
+                # New connection!
+                conn, addr = server.accept()
+                conn.setblocking(False)
+                epoll.register(conn.fileno(), select.EPOLLIN)
+                connections[conn.fileno()] = conn
+            elif event & select.EPOLLIN:
+                # Data ready to read!
+                data = connections[fileno].recv(1024)
+                if data:
+                    connections[fileno].send(b"HTTP/1.1 200 OK\r\n\r\nHello!")
+                else:
+                    epoll.unregister(fileno)
+                    connections[fileno].close()
+                    del connections[fileno]
+
+if __name__ == "__main__":
+    main()
 ```
 
 ## 3. Level-Triggered (LT) vs. Edge-Triggered (ET)

@@ -53,37 +53,48 @@ sequenceDiagram
 
 ### Go Producer with Idempotency (Exactly-Once Semantics)
 
-```go
-package main
+```python
+from confluent_kafka import Producer
+import json
+import sys
 
-import (
-    "fmt"
-    "github.com/confluentinc/confluent-kafka-go/kafka"
-)
+def delivery_report(err, msg):
+    """Called once for each message produced to indicate delivery result."""
+    if err is not None:
+        print(f"Message delivery failed: {err}")
+    else:
+        print(f"Message delivered to {msg.topic()} [{msg.partition()}]")
 
-func main() {
-    p, err := kafka.NewProducer(&kafka.ConfigMap{
-        "bootstrap.servers":  "broker1:9092,broker2:9092",
-        "acks":               "all",  // Strong consistency (CP mode for writes)
-        "enable.idempotence": true,   // Prevents duplicates (assigns PID & sequence numbers)
-        "compression.type":   "lz4",  // LZ4 offers best CPU/throughput tradeoff
-        "linger.ms":          5,      // Wait up to 5ms to batch messages
-        "batch.size":         32768,  // 32KB batches
-    })
-    if err != nil {
-        panic(err)
+def main():
+    # Producer configuration
+    conf = {
+        "bootstrap.servers": "broker1:9092,broker2:9092",
+        "acks": "all",                 # Strong consistency (CP mode for writes)
+        "enable.idempotence": True,    # Prevents duplicates (assigns PID & sequence numbers)
+        "compression.type": "lz4",     # LZ4 offers best CPU/throughput tradeoff
+        "linger.ms": 5,                # Wait up to 5ms to batch messages
+        "batch.size": 32768,           # 32KB batches
     }
-
-    topic := "financial-transactions"
-    // Hashing the key ensures all messages for "user-123" go to the same partition, guaranteeing order.
-    err = p.Produce(&kafka.Message{
-        TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-        Key:            []byte("user-123"), 
-        Value:          []byte(`{"amount": 500, "currency": "USD"}`),
-    }, nil)
     
-    p.Flush(15 * 1000)
-}
+    try:
+        p = Producer(conf)
+    except Exception as e:
+        print(f"Failed to create producer: {e}")
+        sys.exit(1)
+
+    topic = "financial-transactions"
+    
+    # Hashing the key ensures all messages for "user-123" go to the same partition, guaranteeing order.
+    key = "user-123"
+    value = json.dumps({"amount": 500, "currency": "USD"})
+    
+    p.produce(topic, key=key.encode('utf-8'), value=value.encode('utf-8'), callback=delivery_report)
+    
+    # Wait for any outstanding messages to be delivered and delivery reports received
+    p.flush(timeout=15.0)
+
+if __name__ == "__main__":
+    main()
 ```
 
 ### CLI Benchmark: Apache Bench vs Kafka `kafka-producer-perf-test.sh`

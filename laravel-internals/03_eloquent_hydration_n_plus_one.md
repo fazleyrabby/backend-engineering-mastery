@@ -53,16 +53,30 @@ When a row is fetched, Eloquent instantiates an object containing:
 
 Instead of relying on developer discipline, architecturally enforce it at the framework boot level:
 
-```php
-// AppServiceProvider.php
-public function boot()
-{
-    // Throws a LazyLoadingViolationException if N+1 occurs
-    Model::preventLazyLoading(! app()->isProduction());
-    
-    // Warn if a single query takes too long (> 500ms)
-    DB::handleExceedingCumulativeQueryDuration();
-}
+```python
+from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy import Column, Integer, event, Engine
+import time
+import logging
+
+Base = declarative_base()
+
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True)
+    # Throws an error if accessed without eager loading, preventing N+1
+    posts = relationship("Post", lazy="raise")
+
+@event.listens_for(Engine, "before_cursor_execute")
+def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+    conn.info.setdefault('query_start_time', []).append(time.time())
+
+@event.listens_for(Engine, "after_cursor_execute")
+def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+    total_time = time.time() - conn.info['query_start_time'].pop(-1)
+    # Warn if a single query takes too long (> 500ms)
+    if total_time > 0.5:
+        logging.warning(f"Query exceeded 500ms: {total_time}s")
 ```
 
 ### Benchmarks (Hydration Costs)

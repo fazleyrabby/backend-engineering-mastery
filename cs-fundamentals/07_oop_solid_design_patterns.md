@@ -37,55 +37,51 @@ sequenceDiagram
 
 ## 💻 3. Production Code & Benchmarks
 
-Here is an example of applying SOLID and the **Strategy/Factory** patterns in PHP, showcasing dependency inversion.
+Here is an example of applying SOLID and the **Strategy/Factory** patterns in Python, showcasing dependency inversion.
 
-```php
-<?php
+```python
+from typing import Protocol
 
-interface PaymentGatewayInterface {
-    public function charge(float $amount): bool;
-}
+# 1. Interface / Protocol
+class PaymentGatewayInterface(Protocol):
+    def charge(self, amount: float) -> bool:
+        ...
 
-// 1. Concrete Implementations (Infrastructure Layer)
-class StripeGateway implements PaymentGatewayInterface {
-    public function charge(float $amount): bool {
-        // Stripe API integration
-        return true;
-    }
-}
+# 2. Concrete Implementations (Infrastructure Layer)
+class StripeGateway:
+    def charge(self, amount: float) -> bool:
+        # Stripe API integration
+        return True
 
-class PayPalGateway implements PaymentGatewayInterface {
-    public function charge(float $amount): bool {
-        // PayPal API integration
-        return true;
-    }
-}
+class PayPalGateway:
+    def charge(self, amount: float) -> bool:
+        # PayPal API integration
+        return True
 
-// 2. Factory Pattern (Creational)
-class PaymentGatewayFactory {
-    public static function make(string $provider): PaymentGatewayInterface {
-        return match($provider) {
-            'stripe' => new StripeGateway(),
-            'paypal' => new PayPalGateway(),
-            default => throw new InvalidArgumentException("Unsupported provider"),
-        };
-    }
-}
+# 3. Factory Pattern (Creational)
+class PaymentGatewayFactory:
+    @staticmethod
+    def make(provider: str) -> PaymentGatewayInterface:
+        match provider:
+            case "stripe":
+                return StripeGateway()
+            case "paypal":
+                return PayPalGateway()
+            case _:
+                raise ValueError("Unsupported provider")
 
-// 3. Domain Service relying on Abstraction (Dependency Inversion)
-class OrderCheckoutService {
-    public function __construct(private PaymentGatewayInterface $gateway) {}
+# 4. Domain Service relying on Abstraction (Dependency Inversion)
+class OrderCheckoutService:
+    def __init__(self, gateway: PaymentGatewayInterface) -> None:
+        self.gateway = gateway
 
-    public function process(float $total): void {
-        if (!$this->gateway->charge($total)) {
-            throw new Exception("Payment failed");
-        }
-        // Proceed with order confirmation
-    }
-}
+    def process(self, total: float) -> None:
+        if not self.gateway.charge(total):
+            raise Exception("Payment failed")
+        # Proceed with order confirmation
 ```
 
-**Benchmark Insight:** Using interfaces and dynamic instantiation overhead adds microseconds per request in PHP. The real architectural "benchmark" is developer velocity: adding a `CryptoGateway` requires zero modifications to `OrderCheckoutService` (Open/Closed Principle).
+**Benchmark Insight:** Using interfaces and dynamic instantiation overhead adds microseconds per request in Python. The real architectural "benchmark" is developer velocity: adding a `CryptoGateway` requires zero modifications to `OrderCheckoutService` (Open/Closed Principle).
 
 ## ⚔️ 4. Staff / Senior Interview Scenarios
 
