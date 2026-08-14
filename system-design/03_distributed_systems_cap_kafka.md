@@ -16,9 +16,19 @@ The **CAP Theorem** states that when the "loud blender" happens (a Network Parti
 - **CP (Consistency):** Close the shop until they can communicate again (Nobody gets served, but no mistakes are made). Used for bank accounts.
 - **AP (Availability):** Keep serving, but one barista might sell you a pastry they are actually out of. Used for social media feeds.
 
+## 🔬 2. Message Queues vs Event Streams: BullMQ, RabbitMQ & Kafka
+
+Not all queues are created equal. Choose based on your use-case:
+
+| System | Analogy | How Messages Work | Best Used For |
+| :--- | :--- | :--- | :--- |
+| **BullMQ / Redis** | **Sticky-Note Board** | Job is taken, processed, and deleted. High-speed in-memory queue. | Background jobs, delayed tasks (e.g., sending emails in 10 mins). |
+| **RabbitMQ** | **Post Office** | Smart broker routes messages to specific mailboxes. Deleted upon acknowledgment (`ACK`). | Complex task distribution, RPC calls between microservices. |
+| **Apache Kafka** | **Immutable Ledger** | Messages are appended to a permanent log file and kept for days/months. Multiple consumers read at their own speed. | Real-time event streams, audit logs, high-throughput data processing. |
+
 ---
 
-## 🔬 2. Kafka & Zero-Copy I/O: Why is it so fast?
+## ⚡ 3. Kafka & Zero-Copy I/O: Why is it so fast?
 
 **Analogy:** Imagine moving boxes from a warehouse to a delivery truck. The old way is a chain of 4 people passing the box to each other (Slow & lots of handoffs). Kafka's "Zero-Copy" is like a conveyor belt that goes straight from the warehouse shelf into the truck (Fast & skips the middlemen).
 
