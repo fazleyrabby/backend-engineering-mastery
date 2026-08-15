@@ -90,5 +90,5 @@ If you find something wrong but don't have time to fix it, [open an issue](../..
 
 ## 👤 Author & License
 
-- **Author:** Md. Fazley Rabbi (Backend Developer)
+- **Focus:** Backend Engineering & System Design Mastery
 - **License:** MIT License

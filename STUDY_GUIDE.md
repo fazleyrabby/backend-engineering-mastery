@@ -1,7 +1,7 @@
 # 📚 Unified Engineering Mastery Guide & Staff Architect Blueprint
 
-> **Owner:** Md. Fazley Rabbi (Backend Developer)
-> **Repository:** `/Users/rabbi/Desktop/Learning`  
+> **Owner:** [REDACTED]
+> **Repository:** `/path/to/backend-engineering-mastery`  
 > **Target:** Staff Backend Architect & AWS Certified Solutions Architect (SAA-C03) Mastery Path.
 
 ---
