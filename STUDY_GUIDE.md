@@ -160,6 +160,21 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 | **28** | Automated Financial Reconciliation | Matching Internal Orders against Bank CSVs | [`system-design/02`](system-design/02_idempotency_financial_systems.md) |
 | **29** | Production Incident Investigation | 3 Pillars of Observability (Logs, Metrics, Traces) | [`system-design/06`](system-design/06_microservices_saga_observability.md) |
 | **30** | System Architecture Breakdown | Real-World Fraud Detection & Risk Scoring | [`system-design/08`](system-design/08_real_world_fraud_engine_architecture.md) |
+| **31** | Payment Auth vs Capture | Two-Step E-Commerce payment states | [`system-design/09`](system-design/09_payment_gateway_outbox_webhooks.md) |
+| **32** | Webhook Verification | Cryptographic HMAC & Replay Attack Defense | [`cs-fundamentals/08`](cs-fundamentals/08_security_owasp_oauth2.md) |
+| **33** | DB Isolation Levels | Timelines for anomalies (Read Committed vs Repeatable Read) | [`database-deep-dives/01`](database-deep-dives/01_mysql_innodb_internals.md) |
+| **34** | Reconciliation Systems | Parsing settlement files & Fuzzy Matching | [`system-design/13`](system-design/13_reconciliation_matching_systems.md) |
+| **35** | Testing Financial Systems | Mocking Stripe APIs, Database rollbacks, & Race tests | [`interview-practice/03`](interview-practice/03_testing_financial_systems.md) |
+| **36** | Cache Stampedes | Mutex locks & XFetch early expiration | [`system-design/04`](system-design/04_load_balancing_caching_patterns.md) |
+| **37** | Transactional Outbox | Handling dual writes to DB and event streams | [`system-design/09`](system-design/09_payment_gateway_outbox_webhooks.md) |
+| **38** | Float Monetary Traps | Binary rounding issues & Integer Minor Units | [`system-design/02`](system-design/02_idempotency_financial_systems.md) |
+| **39** | CAP Theorem | Consistency vs Availability during network partitions | [`system-design/03`](system-design/03_distributed_systems_cap_kafka.md) |
+| **40** | Horizontal vs Vertical Scaling | Node scaling capabilities vs physical thresholds | [`system-design/04`](system-design/04_load_balancing_caching_patterns.md) |
+| **41** | Circuit Breakers | Preventing cascading failures on external HTTP clients | [`system-design/09`](system-design/09_payment_gateway_outbox_webhooks.md) |
+| **42** | Row (OLTP) vs Column (OLAP) | MySQL InnoDB page scans vs ClickHouse vector execution | [`database-deep-dives/02`](database-deep-dives/02_clickhouse_columnar_mergetree.md) |
+| **43** | gRPC (HTTP/2) vs REST (HTTP/1) | Protocol Buffers, multiplexing, & serialization speeds | [`system-design/10`](system-design/10_grpc_graphql_opentelemetry.md) |
+| **44** | Webhook Security | HMAC signature checks, IP validations, & rate limits | [`cs-fundamentals/08`](cs-fundamentals/08_security_owasp_oauth2.md) |
+| **45** | Unique Queue Jobs | Laravel `ShouldBeUnique` lock mechanics in Redis | [`laravel-internals/04`](laravel-internals/04_queue_architecture_worker_lifecycle.md) |
 
 ---
 
