@@ -1,14 +1,14 @@
 # 📚 Unified Engineering Mastery Guide & Staff Architect Blueprint
 
-> **Owner:** [REDACTED]
-> **Repository:** `/path/to/backend-engineering-mastery`  
+> **Owner:** Md. Fazley Rabbi (Backend Developer)
+> **Repository:** `/Users/rabbi/Desktop/Learning`  
 > **Target:** Staff Backend Architect & AWS Certified Solutions Architect (SAA-C03) Mastery Path.
 
 ---
 
 ## 🏛️ Executive Summary & Study Architecture
 
-This master guide consolidates **593 computer science & backend engineering topics**, **45 senior architectural interview scenarios**, **27 production-grade deep-dive lesson guides**, and **interactive benchmark tools**.
+This master guide consolidates **593 computer science & backend engineering topics**, **30 senior architectural interview scenarios**, **27 production-grade deep-dive lesson guides**, and **interactive benchmark tools**.
 
 ```mermaid
 graph TD
@@ -56,7 +56,7 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 | **03** | [**System Design & Real-Time**](system-design/) | WebSockets, Financial Idempotency, Kafka Pub/Sub, Sharding, Saga, Fraud Engine, Reconciliation | `13 / 13 Complete` |
 | **04** | [**Laravel Internals**](laravel-internals/) | Reflection Container, Request Lifecycle, Eloquent Hydration, Octane Safety | `4 / 4 Complete` |
 | **05** | [**Cloud & DevOps**](cloud-devops/) | Docker Kernel Namespaces, CI/CD, AWS Architecture, Terraform, SAA-C03 Guide | `5 / 5 Complete` |
-| **06** | [**Interview Practice**](interview-practice/) | 45 Architectural Questions, Domain Deep Dives & Financial Testing | `3 / 3 Complete` |
+| **06** | [**Interview Practice**](interview-practice/) | 35 Architectural Questions, Domain Deep Dives & Financial Testing | `3 / 3 Complete` |
 
 ---
 
@@ -79,7 +79,7 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 - [x] 📄 [**`03_redis_structures_locks.md`**](database-deep-dives/03_redis_structures_locks.md) — Redis SDS, SkipLists, Redlock Distributed Lock Algorithm & Atomic Lua Scripts.
 - [x] 📄 [**`04_postgresql_internals_wal_vacuum.md`**](database-deep-dives/04_postgresql_internals_wal_vacuum.md) — PostgreSQL MVCC (Tuple Versioning), Write-Ahead Logging (WAL), Auto-VACUUM & GIN/JSONB Indexing.
 - [x] 📄 [**`05_sql_mastery_joins_ctes_windows.md`**](database-deep-dives/05_sql_mastery_joins_ctes_windows.md) — JOINs Deep Dive, GROUP BY & Aggregations, CTEs, Window Functions (ROW_NUMBER, RANK, SUM OVER), Cursor Pagination.
-- [x] 📄 [**`06_database_normalization_denormalization.md`**](database-deep-dives/06_database_normalization_denormalization.md) — 1NF to 3NF+BCNF with a payments example, functional dependencies, strategic denormalization for OLAP/fraud & JSON vs relations.
+- [x] 📄 [**`06_database_normalization_denormalization.md`**](database-deep-dives/06_database_normalization_denormalization.md) — 1NF→3NF+BCNF with a payments example, functional dependencies, strategic denormalization for OLAP/fraud & JSON vs relations.
 
 ---
 
@@ -120,13 +120,13 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 ---
 
 ### 🎯 Module 6: Technical Interview Preparation & Resume Deep-Dives
-- [x] 📄 [**`01_master_45_interview_questions.md`**](interview-practice/01_master_45_interview_questions.md) — Complete Answer Strategies & Architectural Breakdowns for the **45 Core Senior Interview Questions** (incl. Auth vs Capture, Webhook HMAC, Isolation Levels, Reconciliation, Testing, Cache Stampedes, Transactional Outbox).
+- [x] 📄 [**`01_master_30_interview_questions.md`**](interview-practice/01_master_30_interview_questions.md) — Complete Answer Strategies & Architectural Breakdowns for the **35 Core Senior Interview Questions** (incl. Auth vs Capture, Webhook HMAC, Isolation Levels, Reconciliation, Testing).
 - [x] 📄 [**`02_php_laravel_domain_deep_dives.md`**](interview-practice/02_php_laravel_domain_deep_dives.md) — Tailored Interview Q&A for **Payment Gateways, Fraud Engines, Out-of-Order Webhooks, ClickHouse OLAP vs MySQL, and FrankenPHP**.
 - [x] 📄 [**`03_testing_financial_systems.md`**](interview-practice/03_testing_financial_systems.md) — Testing Financial Systems: Unit/Integration/Feature Tests, Mocking Payment APIs, Race Conditions, Currency Rounding & Edge Cases.
 
 ---
 
-## 🔴 Section I: The 45 Priority Senior Architectural Scenarios
+## 🔴 Section I: The 30 Priority Senior Architectural Scenarios
 
 | # | Question / Scenario | Key Focus Area | Deep Dive Resource |
 | :-: | :--- | :--- | :--- |
@@ -160,21 +160,6 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 | **28** | Automated Financial Reconciliation | Matching Internal Orders against Bank CSVs | [`system-design/02`](system-design/02_idempotency_financial_systems.md) |
 | **29** | Production Incident Investigation | 3 Pillars of Observability (Logs, Metrics, Traces) | [`system-design/06`](system-design/06_microservices_saga_observability.md) |
 | **30** | System Architecture Breakdown | Real-World Fraud Detection & Risk Scoring | [`system-design/08`](system-design/08_real_world_fraud_engine_architecture.md) |
-| **31** | Payment Auth vs Capture | Two-Step E-Commerce payment states | [`system-design/09`](system-design/09_payment_gateway_outbox_webhooks.md) |
-| **32** | Webhook Verification | Cryptographic HMAC & Replay Attack Defense | [`cs-fundamentals/08`](cs-fundamentals/08_security_owasp_oauth2.md) |
-| **33** | DB Isolation Levels | Timelines for anomalies (Read Committed vs Repeatable Read) | [`database-deep-dives/01`](database-deep-dives/01_mysql_innodb_internals.md) |
-| **34** | Reconciliation Systems | Parsing settlement files & Fuzzy Matching | [`system-design/13`](system-design/13_reconciliation_matching_systems.md) |
-| **35** | Testing Financial Systems | Mocking Stripe APIs, Database rollbacks, & Race tests | [`interview-practice/03`](interview-practice/03_testing_financial_systems.md) |
-| **36** | Cache Stampedes | Mutex locks & XFetch early expiration | [`system-design/04`](system-design/04_load_balancing_caching_patterns.md) |
-| **37** | Transactional Outbox | Handling dual writes to DB and event streams | [`system-design/09`](system-design/09_payment_gateway_outbox_webhooks.md) |
-| **38** | Float Monetary Traps | Binary rounding issues & Integer Minor Units | [`system-design/02`](system-design/02_idempotency_financial_systems.md) |
-| **39** | CAP Theorem | Consistency vs Availability during network partitions | [`system-design/03`](system-design/03_distributed_systems_cap_kafka.md) |
-| **40** | Horizontal vs Vertical Scaling | Node scaling capabilities vs physical thresholds | [`system-design/04`](system-design/04_load_balancing_caching_patterns.md) |
-| **41** | Circuit Breakers | Preventing cascading failures on external HTTP clients | [`system-design/09`](system-design/09_payment_gateway_outbox_webhooks.md) |
-| **42** | Row (OLTP) vs Column (OLAP) | MySQL InnoDB page scans vs ClickHouse vector execution | [`database-deep-dives/02`](database-deep-dives/02_clickhouse_columnar_mergetree.md) |
-| **43** | gRPC (HTTP/2) vs REST (HTTP/1) | Protocol Buffers, multiplexing, & serialization speeds | [`system-design/10`](system-design/10_grpc_graphql_opentelemetry.md) |
-| **44** | Webhook Security | HMAC signature checks, IP validations, & rate limits | [`cs-fundamentals/08`](cs-fundamentals/08_security_owasp_oauth2.md) |
-| **45** | Unique Queue Jobs | Laravel `ShouldBeUnique` lock mechanics in Redis | [`laravel-internals/04`](laravel-internals/04_queue_architecture_worker_lifecycle.md) |
 
 ---
 

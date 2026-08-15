@@ -2,7 +2,7 @@
 
 ## 1. Real-World Analogy: The Filing Cabinet vs The Dashboard
 
-Imagine running the back office of a global payment processor:
+Imagine running the back office of an e-commerce payments company (think Electronic First):
 
 - **Unnormalized data**: One giant spreadsheet row per transaction that also crams in the customer's full name, address, the product catalog description, the partner's API key, and the dispute status. Fast to *write* once, but a nightmare to *update* — change a customer's city and you must hunt down 10,000 rows.
 - **Normalized data**: Separate, linked folders — `customers`, `orders`, `order_items`, `payments`, `disputes`. Each fact lives in exactly one place. Update the city once, it propagates everywhere via the link.
@@ -33,9 +33,11 @@ A column `B` is **functionally dependent** on `A` if knowing `A` tells you `B` u
 
 Start with a messy flat `orders` table (an order can have many items, one customer):
 
-| 1001 | John | New York | "Laravel Book, Sticker" | Stripe | 3.5 |
-| 1001 | John | New York | "Mug" | Stripe | 3.5 |
-| 1002 | Jane | Chicago | "Course" | PayPal | 2.0 |
+| order_id | customer_name | customer_city | items (CSV) | partner_name | partner_fee_pct |
+|----------|---------------|---------------|-------------|--------------|-----------------|
+| 1001 | Fazley | Chittagong | "Laravel Book, Sticker" | Ezpin | 3.5 |
+| 1001 | Fazley | Chittagong | "Mug" | Ezpin | 3.5 |
+| 1002 | Ayesha | Dhaka | "Course" | Gamivo | 2.0 |
 
 **Problems**: `customer_name` repeats per row (update anomaly), `items` is a multi-valued CSV (can't query one item), `partner_fee_pct` is duplicated (delete anomaly if the order is removed).
 
