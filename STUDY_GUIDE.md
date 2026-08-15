@@ -52,7 +52,7 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 | Module | Core Domain | Focus Topics | Progress Status |
 | :--- | :--- | :--- | :---: |
 | **01** | [**CS Fundamentals**](cs-fundamentals/) | CPU, Memory, Linux I/O, `epoll`, TCP/TLS 1.3, Big-O, Dynamic Programming, OWASP | `8 / 8 Complete` |
-| **02** | [**Database Deep Dives**](database-deep-dives/) | MySQL InnoDB Buffer Pool, ClickHouse Columnar MergeTree, Redis SDS & Redlock, SQL Mastery | `5 / 5 Complete` |
+| **02** | [**Database Deep Dives**](database-deep-dives/) | MySQL InnoDB Buffer Pool, ClickHouse Columnar MergeTree, Redis SDS & Redlock, SQL Mastery, Normalization | `6 / 6 Complete` |
 | **03** | [**System Design & Real-Time**](system-design/) | WebSockets, Financial Idempotency, Kafka Pub/Sub, Sharding, Saga, Fraud Engine, Reconciliation | `13 / 13 Complete` |
 | **04** | [**Laravel Internals**](laravel-internals/) | Reflection Container, Request Lifecycle, Eloquent Hydration, Octane Safety | `4 / 4 Complete` |
 | **05** | [**Cloud & DevOps**](cloud-devops/) | Docker Kernel Namespaces, CI/CD, AWS Architecture, Terraform, SAA-C03 Guide | `5 / 5 Complete` |
@@ -79,6 +79,7 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 - [x] 📄 [**`03_redis_structures_locks.md`**](database-deep-dives/03_redis_structures_locks.md) — Redis SDS, SkipLists, Redlock Distributed Lock Algorithm & Atomic Lua Scripts.
 - [x] 📄 [**`04_postgresql_internals_wal_vacuum.md`**](database-deep-dives/04_postgresql_internals_wal_vacuum.md) — PostgreSQL MVCC (Tuple Versioning), Write-Ahead Logging (WAL), Auto-VACUUM & GIN/JSONB Indexing.
 - [x] 📄 [**`05_sql_mastery_joins_ctes_windows.md`**](database-deep-dives/05_sql_mastery_joins_ctes_windows.md) — JOINs Deep Dive, GROUP BY & Aggregations, CTEs, Window Functions (ROW_NUMBER, RANK, SUM OVER), Cursor Pagination.
+- [x] 📄 [**`06_database_normalization_denormalization.md`**](database-deep-dives/06_database_normalization_denormalization.md) — 1NF to 3NF+BCNF with a payments example, functional dependencies, strategic denormalization for OLAP/fraud & JSON vs relations.
 
 ---
 
