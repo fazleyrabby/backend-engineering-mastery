@@ -56,7 +56,7 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 | **03** | [**System Design & Real-Time**](system-design/) | WebSockets, Financial Idempotency, Kafka Pub/Sub, Sharding, Saga, Fraud Engine, Reconciliation | `13 / 13 Complete` |
 | **04** | [**Laravel Internals**](laravel-internals/) | Reflection Container, Request Lifecycle, Eloquent Hydration, Octane Safety | `4 / 4 Complete` |
 | **05** | [**Cloud & DevOps**](cloud-devops/) | Docker Kernel Namespaces, CI/CD, AWS Architecture, Terraform, SAA-C03 Guide | `5 / 5 Complete` |
-| **06** | [**Interview Practice**](interview-practice/) | 35 Architectural Questions, Domain Deep Dives & Financial Testing | `3 / 3 Complete` |
+| **06** | [**Interview Practice**](interview-practice/) | 45 Architectural Questions, Domain Deep Dives & Financial Testing | `3 / 3 Complete` |
 
 ---
 
@@ -120,13 +120,13 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 ---
 
 ### 🎯 Module 6: Technical Interview Preparation & Resume Deep-Dives
-- [x] 📄 [**`01_master_30_interview_questions.md`**](interview-practice/01_master_30_interview_questions.md) — Complete Answer Strategies & Architectural Breakdowns for the **35 Core Senior Interview Questions** (incl. Auth vs Capture, Webhook HMAC, Isolation Levels, Reconciliation, Testing).
+- [x] 📄 [**`01_master_30_interview_questions.md`**](interview-practice/01_master_30_interview_questions.md) — Complete Answer Strategies & Architectural Breakdowns for the **45 Core Senior Interview Questions** (incl. Auth vs Capture, Webhook HMAC, Isolation Levels, Reconciliation, Testing, Cache Stampedes, Transactional Outbox).
 - [x] 📄 [**`02_php_laravel_domain_deep_dives.md`**](interview-practice/02_php_laravel_domain_deep_dives.md) — Tailored Interview Q&A for **Payment Gateways, Fraud Engines, Out-of-Order Webhooks, ClickHouse OLAP vs MySQL, and FrankenPHP**.
 - [x] 📄 [**`03_testing_financial_systems.md`**](interview-practice/03_testing_financial_systems.md) — Testing Financial Systems: Unit/Integration/Feature Tests, Mocking Payment APIs, Race Conditions, Currency Rounding & Edge Cases.
 
 ---
 
-## 🔴 Section I: The 30 Priority Senior Architectural Scenarios
+## 🔴 Section I: The 45 Priority Senior Architectural Scenarios
 
 | # | Question / Scenario | Key Focus Area | Deep Dive Resource |
 | :-: | :--- | :--- | :--- |

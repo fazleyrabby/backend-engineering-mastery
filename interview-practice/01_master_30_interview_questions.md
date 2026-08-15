@@ -1,4 +1,4 @@
-# Master Interview Blueprint: The 30 Core Senior Questions
+# Master Interview Blueprint: The 45 Core Senior Questions
 
 > **Module:** Interview Practice (Topic 6.1)  
 
@@ -16,7 +16,7 @@ In Staff & Senior Backend engineering interviews (and everyday engineering discu
 
 ---
 
-## ⚔️ The 30 Core Questions & Answer Strategies
+## ⚔️ The 45 Core Questions & Answer Strategies
 
 ### 1. Explain OOP and its four principles with examples from a Python application.
 > **Answer Strategy:** Define Encapsulation (Private model attributes/getters), Abstraction (Hiding HTTP calls inside a Service class), Inheritance (Base BaseModel class), and Polymorphism (Injecting `PaymentGatewayInterface` with `Stripe` or `PayPal` implementations).
@@ -127,3 +127,33 @@ In Staff & Senior Backend engineering interviews (and everyday engineering discu
 
 ### 35. How do you test a payment integration?
 > **Answer Strategy:** 1. **Mocking HTTP:** In unit tests, use a library to intercept HTTP calls and mock Stripe's JSON responses, never hitting the real network. 2. **Edge Cases:** Explicitly write tests for network timeouts, 500 server errors, and duplicate webhook replays. 3. **Database Transactions:** Ensure integration tests verify that on a failed payment, the database correctly rolls back any partial state changes.
+
+### 36. What is a Cache Stampede (Thundering Herd) and how do you prevent it?
+> **Answer Strategy:** 1. **The Analogy:** Like a crowd rushing a door when a store opens. 2. **The Problem:** Key expiry concurrency where a popular cache key expires and thousands of requests hit the database simultaneously. 3. **Prevention:** Use a Mutex lock solution so only one thread regenerates the cache while others wait, or use XFetch probabilistic early expiration to refresh it in the background before it actually expires.
+
+### 37. What is the Transactional Outbox Pattern and why do we use it?
+> **Answer Strategy:** 1. **The Analogy:** Writing a letter and putting it in an outbox tray for the mailman to pick up later, rather than walking to the post office yourself. 2. **The Problem:** The dual-write problem where an app updates a DB and publishes an event (e.g., Kafka) but fails in between, causing inconsistency. 3. **The Solution:** Save event payloads in a local `outbox` table within the same DB transaction, then use an async relay process to forward events to Kafka/Webhooks.
+
+### 38. Why shouldn't you use floating-point numbers for monetary values?
+> **Answer Strategy:** 1. **The Analogy:** Using approximate measurements (like cups) instead of precise weight (grams) in a chemistry lab. 2. **The Problem:** Binary floating-point representation limits precision ($0.1 + 0.2 = 0.30000000000000004$), leading to lost or gained fractions of pennies during calculations. 3. **The Solution:** Store money as integer minor units (e.g., cents) or use SQL `DECIMAL`/`NUMERIC` data types for exact precision.
+
+### 39. What is the CAP Theorem and how does it apply to database selection?
+> **Answer Strategy:** 1. **The Analogy:** The classic project management triangle: you can pick fast, cheap, or good, but rarely all three. 2. **Trade-offs:** You can only guarantee two out of Consistency, Availability, and Partition Tolerance during a network failure. 3. **Selection:** Choose CP (ZooKeeper/Postgres) for transactions where data correctness is critical. Choose AP (Cassandra/DynamoDB) for analytics where returning *some* data is better than failing.
+
+### 40. What is the difference between horizontal and vertical scaling, and what are their limits?
+> **Answer Strategy:** 1. **The Analogy:** Upgrading your car's engine (Vertical) vs buying a fleet of smaller cars (Horizontal). 2. **Vertical Scaling:** Adding CPU/RAM to a single machine. It is easy but has a physical hardware limit and creates a Single Point of Failure (SPOF). 3. **Horizontal Scaling:** Adding more instances. It offers theoretically limitless scaling but requires stateless application architecture and adds state synchronization overhead.
+
+### 41. What is a Circuit Breaker pattern and how does it prevent cascading failures?
+> **Answer Strategy:** 1. **The Analogy:** An electrical circuit breaker that trips to prevent a surge from burning down your house. 2. **The Problem:** Prevents cascading failures by failing fast on downstream timeout storms instead of exhausting connection pools. 3. **The Solution:** Implements states (Closed, Open, Half-Open) allowing the downstream service time to recover, providing automated self-healing.
+
+### 42. Explain the difference between Row-Oriented (OLTP) and Column-Oriented (OLAP) databases.
+> **Answer Strategy:** 1. **The Analogy:** Reading a book page by page (Row) vs reading only the index for a specific word across all books (Column). 2. **Row-Oriented:** Stores data row by row (e.g., MySQL InnoDB page scanning), ideal for fast inserts/updates of single records (OLTP). 3. **Column-Oriented:** Stores data column by column (e.g., ClickHouse file reading), ideal for analytics (OLAP) due to massive compression and vector execution on specific columns.
+
+### 43. What is the difference between gRPC (HTTP/2) and REST (HTTP/1.1)?
+> **Answer Strategy:** 1. **The Analogy:** A fast, structured telegram (gRPC) vs a descriptive, human-readable letter (REST). 2. **Protocol & Data:** gRPC uses Binary Protocol Buffers over multiplexed HTTP/2, offering incredibly fast serialization. REST uses text-based JSON over HTTP/1.1. 3. **Features:** gRPC natively supports bi-directional streaming and strict typing, making it superior for internal microservice communication.
+
+### 44. What are the primary concerns in securing a webhook receiver endpoint?
+> **Answer Strategy:** 1. **The Analogy:** A bouncer at an exclusive club checking IDs, scanning the guest list, and enforcing a capacity limit. 2. **Authentication:** Always mandate HTTPS and verify HMAC signatures to ensure the payload hasn't been tampered with. 3. **Network Defense:** Implement IP whitelisting/validation to only accept requests from the provider, and enforce API rate-limiting to prevent DoS attacks.
+
+### 45. Explain the difference between standard queue jobs and unique queue jobs.
+> **Answer Strategy:** 1. **The Analogy:** Taking every single flyer handed to you (Standard) vs taking one and ignoring duplicates (Unique). 2. **Standard Jobs:** Normal FIFO delivery where every dispatched job runs independently. 3. **Unique Jobs:** Uses a lock-prevented deduplication strategy (e.g., Laravel `ShouldBeUnique` using Redis keys) to lock a job while it sits in the queue, preventing identical jobs from stacking up or causing race conditions.
