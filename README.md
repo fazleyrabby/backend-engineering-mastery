@@ -35,9 +35,9 @@ The repository includes CLI performance benchmark scripts under `sample-codes/`:
 
 ---
 
-## 🔴 The 30 Senior Architectural Scenarios Matrix
+## 🔴 The 45 Senior Architectural Scenarios Matrix
 
-This repository includes concrete answer strategies and system design breakdowns for 30 critical senior interview questions, including:
+This repository includes concrete answer strategies and system design breakdowns for 45 critical senior interview questions, including:
 
 - **Overselling Prevention:** Mutex locks, Redis ZSET sliding windows, and pessimistic `SELECT FOR UPDATE`.
 - **Financial Ledgers:** Double-entry immutable accounting, integer minor units (cents), and reconciliation.

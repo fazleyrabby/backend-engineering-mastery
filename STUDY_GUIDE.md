@@ -8,7 +8,7 @@
 
 ## 🏛️ Executive Summary & Study Architecture
 
-This master guide consolidates **593 computer science & backend engineering topics**, **30 senior architectural interview scenarios**, **27 production-grade deep-dive lesson guides**, and **interactive benchmark tools**.
+This master guide consolidates **593 computer science & backend engineering topics**, **45 senior architectural interview scenarios**, **27 production-grade deep-dive lesson guides**, and **interactive benchmark tools**.
 
 ```mermaid
 graph TD
