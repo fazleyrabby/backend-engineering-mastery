@@ -44,7 +44,7 @@ This repository includes concrete answer strategies and system design breakdowns
 - **Out-of-Order Webhooks:** Transactional Outbox Pattern, idempotency keys, and exponential backoff retry.
 - **High Concurrency:** Scaling WebSockets to 100k open sockets with Soketi/Reverb and Redis Pub/Sub relay.
 
-Detailed answers available in [`interview-practice/01_master_30_interview_questions.md`](interview-practice/01_master_30_interview_questions.md) and [`STUDY_GUIDE.md`](STUDY_GUIDE.md).
+Detailed answers available in [`interview-practice/01_master_45_interview_questions.md`](interview-practice/01_master_45_interview_questions.md) and [`STUDY_GUIDE.md`](STUDY_GUIDE.md).
 
 ---
 

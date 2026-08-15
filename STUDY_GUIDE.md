@@ -120,7 +120,7 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 ---
 
 ### 🎯 Module 6: Technical Interview Preparation & Resume Deep-Dives
-- [x] 📄 [**`01_master_30_interview_questions.md`**](interview-practice/01_master_30_interview_questions.md) — Complete Answer Strategies & Architectural Breakdowns for the **45 Core Senior Interview Questions** (incl. Auth vs Capture, Webhook HMAC, Isolation Levels, Reconciliation, Testing, Cache Stampedes, Transactional Outbox).
+- [x] 📄 [**`01_master_45_interview_questions.md`**](interview-practice/01_master_45_interview_questions.md) — Complete Answer Strategies & Architectural Breakdowns for the **45 Core Senior Interview Questions** (incl. Auth vs Capture, Webhook HMAC, Isolation Levels, Reconciliation, Testing, Cache Stampedes, Transactional Outbox).
 - [x] 📄 [**`02_php_laravel_domain_deep_dives.md`**](interview-practice/02_php_laravel_domain_deep_dives.md) — Tailored Interview Q&A for **Payment Gateways, Fraud Engines, Out-of-Order Webhooks, ClickHouse OLAP vs MySQL, and FrankenPHP**.
 - [x] 📄 [**`03_testing_financial_systems.md`**](interview-practice/03_testing_financial_systems.md) — Testing Financial Systems: Unit/Integration/Feature Tests, Mocking Payment APIs, Race Conditions, Currency Rounding & Edge Cases.
 
