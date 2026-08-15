@@ -1,7 +1,6 @@
 # Master Interview Blueprint: The 30 Core Senior Questions
 
 > **Module:** Interview Practice (Topic 6.1)  
-> **Source Mapping:** `roadmap.md` (Lines 465–570)
 
 ---
 

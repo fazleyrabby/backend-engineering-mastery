@@ -1,7 +1,6 @@
 # Idempotency, Double-Entry Ledgers, Financial Systems & Webhook Retries
 
 > **Module:** System Design & Real-Time (Topic 3.2)  
-> **Source Mapping:** `backend-roadmap.md` (Level 10: #233–#244, Level 14 & 15) & `roadmap.md` (Tier 1: #95–#132)
 
 ---
 

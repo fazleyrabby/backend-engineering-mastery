@@ -1,7 +1,6 @@
 # Real-World Fraud Detection Engine Architecture
 
 > **Module:** System Design & Real-Time (Topic 3.8)  
-> **Source Mapping:** E-Commerce Risk Management
 
 ---
 

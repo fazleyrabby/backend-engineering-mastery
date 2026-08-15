@@ -1,7 +1,6 @@
 # OOP Principles, SOLID, Clean Architecture & Design Patterns
 
 > **Module:** CS Fundamentals (Topic 1.7)  
-> **Source Mapping:** `backend-roadmap.md` (Level 1 & Level 21) & `roadmap.md` (Tier 1: #01, #02, #03)
 
 ---
 

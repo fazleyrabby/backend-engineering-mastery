@@ -1,7 +1,6 @@
 # Database Scaling: Replication, Sharding & Partitioning
 
 > **Module:** System Design & Real-Time (Topic 3.5)  
-> **Source Mapping:** `backend-roadmap.md` (Level 23: #484–#487) & `roadmap.md` (Tier 1: #260–#263)
 
 ---
 

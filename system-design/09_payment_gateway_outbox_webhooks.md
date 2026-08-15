@@ -1,7 +1,6 @@
 # High-Volume Payment Gateway Integration & Webhooks
 
 > **Module:** System Design & Real-Time (Topic 3.9)  
-> **Source Mapping:** Multi-Gateway Integration & Outbox Pattern
 
 ---
 

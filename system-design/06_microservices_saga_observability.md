@@ -1,7 +1,6 @@
 # Microservices vs Monolith, Saga Pattern & Observability
 
 > **Module:** System Design & Real-Time (Topic 3.6)  
-> **Source Mapping:** `backend-roadmap.md` (Level 22 & 28) & `roadmap.md` (Tier 1: #264–#270)
 
 ---
 

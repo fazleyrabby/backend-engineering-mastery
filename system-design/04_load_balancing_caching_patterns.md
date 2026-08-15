@@ -1,7 +1,6 @@
 # System Design Blueprint: Load Balancing, Caching & Scaling
 
 > **Module:** System Design & Real-Time (Topic 3.4)  
-> **Source Mapping:** `backend-roadmap.md` (Level 23: #465–#494) & `roadmap.md` (Tier 1: #247–#270)
 
 ---
 

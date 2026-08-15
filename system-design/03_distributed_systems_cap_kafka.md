@@ -1,7 +1,6 @@
 # Distributed Systems, CAP Theorem & Event-Driven Architecture
 
 > **Module:** System Design & Real-Time (Topic 3.3)  
-> **Source Mapping:** `backend-roadmap.md` (Level 23 & 29: #588–#593) & `roadmap.md` (Tier 3: #322–#326)
 
 ---
 

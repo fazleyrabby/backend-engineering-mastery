@@ -1,7 +1,6 @@
 # Terraform IaC, Tunnels & Mesh Networks (Staff Architect Edition)
 
 > **Module:** Cloud & DevOps (Topic 5.4)
-> **Source Mapping:** `backend-roadmap.md` & Homelab Stack
 
 ---
 

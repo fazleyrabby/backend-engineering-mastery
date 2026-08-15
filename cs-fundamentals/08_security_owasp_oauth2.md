@@ -1,7 +1,6 @@
 # Web Application Security, OWASP Top 10 & OAuth 2.0
 
 > **Module:** CS Fundamentals (Topic 1.8)
-> **Source Mapping:** `backend-roadmap.md` & `roadmap.md`
 
 ---
 

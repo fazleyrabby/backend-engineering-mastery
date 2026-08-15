@@ -1,7 +1,6 @@
 # Data Structures & Big-O: The Bedrock of Backend Engineering
 
 > **Module:** CS Fundamentals (Topic 1.4)  
-> **Source Mapping:** `backend-roadmap.md` (Level 3: #73–#95) & `roadmap.md` (Tier 1: #18, #19)
 
 ---
 

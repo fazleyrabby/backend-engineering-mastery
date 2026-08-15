@@ -1,7 +1,6 @@
 # CI/CD Pipelines, Zero-Downtime Deployments & Migrations (Staff Architect Edition)
 
 > **Module:** Cloud & DevOps (Topic 5.2)
-> **Source Mapping:** `backend-roadmap.md` & `roadmap.md`
 
 ---
 

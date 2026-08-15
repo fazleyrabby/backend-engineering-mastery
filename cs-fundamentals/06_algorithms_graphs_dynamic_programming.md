@@ -1,7 +1,6 @@
 # Advanced Algorithms, Graphs & Dynamic Programming
 
 > **Module:** CS Fundamentals (Topic 1.6)  
-> **Source Mapping:** `backend-roadmap.md` (Level 3: #73–#95) & `roadmap.md` (Tier 1: Data Structures & Algorithms)
 
 ## 💡 Conceptual Blueprint & First Principles
 

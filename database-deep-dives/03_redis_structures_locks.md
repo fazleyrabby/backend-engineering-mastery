@@ -1,7 +1,6 @@
 # Redis Internals, Data Structures & Distributed Locks
 
 > **Module:** Database Deep Dives (Topic 2.3)  
-> **Source Mapping:** `backend-roadmap.md` (Level 13: #304–#321)
 
 ---
 

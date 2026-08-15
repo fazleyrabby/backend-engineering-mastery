@@ -1,7 +1,6 @@
 # ClickHouse Columnar Storage & MergeTree Mechanics
 
 > **Module:** Database Deep Dives (Topic 2.2)  
-> **Source Mapping:** `backend-roadmap.md` (Level 29: #580–#585)
 
 ---
 

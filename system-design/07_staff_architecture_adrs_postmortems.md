@@ -1,7 +1,6 @@
 # Staff Engineering Leadership, System Trade-offs & High-Scale Systems
 
 > **Module:** System Design & Real-Time (Topic 3.7)  
-> **Source Mapping:** Staff / Lead Engineer Interview Preparation & Career Growth
 
 ---
 
