@@ -54,9 +54,10 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 | **01** | [**CS Fundamentals**](cs-fundamentals/) | CPU, Memory, Linux I/O, `epoll`, TCP/TLS 1.3, Big-O, Dynamic Programming, OWASP | `8 / 8 Complete` |
 | **02** | [**Database Deep Dives**](database-deep-dives/) | MySQL InnoDB Buffer Pool, ClickHouse Columnar MergeTree, Redis SDS & Redlock, SQL Mastery, Normalization | `6 / 6 Complete` |
 | **03** | [**System Design & Real-Time**](system-design/) | WebSockets, Financial Idempotency, Kafka Pub/Sub, Sharding, Saga, Fraud Engine, Reconciliation | `13 / 13 Complete` |
-| **04** | [**Laravel Internals**](laravel-internals/) | Reflection Container, Request Lifecycle, Eloquent Hydration, Octane Safety | `4 / 4 Complete` |
-| **05** | [**Cloud & DevOps**](cloud-devops/) | Docker Kernel Namespaces, CI/CD, AWS Architecture, Terraform, SAA-C03 Guide | `5 / 5 Complete` |
-| **06** | [**Interview Practice**](interview-practice/) | 35 Architectural Questions, Domain Deep Dives & Financial Testing | `3 / 3 Complete` |
+| **04** | [**Laravel Internals**](laravel-internals/) | Reflection Container, Request Lifecycle, Eloquent Hydration, Octane Safety | `6 / 6 Complete` |
+| **05** | [**Laravel Mastery**](laravel-mastery/) | Routing, Eloquent, Auth, Testing, APIs, Job Queues & Design Patterns | `0 / 6 Complete` |
+| **06** | [**Cloud & DevOps**](cloud-devops/) | Docker Kernel Namespaces, CI/CD, AWS Architecture, Terraform, SAA-C03 Guide | `5 / 5 Complete` |
+| **07** | [**Interview Practice**](interview-practice/) | 35 Architectural Questions, Domain Deep Dives & Financial Testing | `3 / 3 Complete` |
 
 ---
 
@@ -114,7 +115,17 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 
 ---
 
-### ☁️ Module 5: Cloud Infrastructure, DevOps & Homelab
+### 🛠️ Module 5: Laravel Mastery & Practical Software Engineering
+- [ ] 📄 [**`01_routing_controllers_requests.md`**](laravel-mastery/01_routing_controllers_requests.md) — Routing, Controllers, Route Model Binding, Form Requests & Input Validation.
+- [ ] 📄 [**`02_eloquent_relationships_transactions.md`**](laravel-mastery/02_eloquent_relationships_transactions.md) — Eloquent Relationships (One-to-Many, Many-to-Many, Polymorphic), Database Migrations & Database Transactions.
+- [ ] 📄 [**`03_authentication_authorization_apis.md`**](laravel-mastery/03_authentication_authorization_apis.md) — Authentication (Sanctum/Passport), Access Policies, API Resources & JSON Payloads.
+- [ ] 📄 [**`04_advanced_features_scheduling.md`**](laravel-mastery/04_advanced_features_scheduling.md) — Custom Artisan commands, Task Scheduling, Filesystems & Async Mail/Notifications.
+- [ ] 📄 [**`05_testing_debugging_ci.md`**](laravel-mastery/05_testing_debugging_ci.md) — Feature & Unit Testing (Pest/PHPUnit), Mocking services, HTTP & DB state assertions.
+- [ ] 📄 [**`06_laravel_design_patterns.md`**](laravel-mastery/06_laravel_design_patterns.md) — Architectural patterns: Service-Repositories, DTOs, Action classes, and the Pipeline processing pattern.
+
+---
+
+### ☁️ Module 6: Cloud Infrastructure, DevOps & Homelab
 - [x] 📄 [**`01_docker_kernel_namespaces_nginx.md`**](cloud-devops/01_docker_kernel_namespaces_nginx.md) — Linux Kernel Namespaces, Cgroups v2, Nginx Reverse Proxies & SSL Termination.
 - [x] 📄 [**`02_cicd_zero_downtime_deployments.md`**](cloud-devops/02_cicd_zero_downtime_deployments.md) — CI/CD Pipelines, Blue-Green & Canary Deployments, Zero-Downtime Database Migrations.
 - [x] 📄 [**`03_aws_cloud_architecture_kubernetes.md`**](cloud-devops/03_aws_cloud_architecture_kubernetes.md) — AWS VPC Architecture (Subnets, Security Groups, ECS/Fargate, RDS) & Kubernetes Fundamentals.
@@ -123,7 +134,7 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 
 ---
 
-### 🎯 Module 6: Technical Interview Preparation & Resume Deep-Dives
+### 🎯 Module 7: Technical Interview Preparation & Resume Deep-Dives
 - [x] 📄 [**`01_master_30_interview_questions.md`**](interview-practice/01_master_30_interview_questions.md) — Complete Answer Strategies & Architectural Breakdowns for the **35 Core Senior Interview Questions** (incl. Auth vs Capture, Webhook HMAC, Isolation Levels, Reconciliation, Testing).
 - [x] 📄 [**`02_php_laravel_domain_deep_dives.md`**](interview-practice/02_php_laravel_domain_deep_dives.md) — Tailored Interview Q&A for **Payment Gateways, Fraud Engines, Out-of-Order Webhooks, ClickHouse OLAP vs MySQL, and FrankenPHP**.
 - [x] 📄 [**`03_testing_financial_systems.md`**](interview-practice/03_testing_financial_systems.md) — Testing Financial Systems: Unit/Integration/Feature Tests, Mocking Payment APIs, Race Conditions, Currency Rounding & Edge Cases.
