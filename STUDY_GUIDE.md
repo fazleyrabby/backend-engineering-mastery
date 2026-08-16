@@ -201,6 +201,9 @@ mindmap
       Reflection Container
       Octane Memory Safety
       Eloquent Hydration
+      Routing & Form Validation
+      Testing & Mocking
+      Architectural Design Patterns
     Cloud & DevOps
       Docker Namespaces
       AWS SAA C03 Architecture
