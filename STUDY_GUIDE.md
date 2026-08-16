@@ -97,6 +97,10 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 - [x] 📄 [**`11_elasticsearch_opensearch_inverted_index.md`**](system-design/11_elasticsearch_opensearch_inverted_index.md) — Inverted Indexes, BM25 / TF-IDF Relevance Scoring, Lucene Segment Merges & Cluster Sharding.
 - [x] 📄 [**`12_ai_vector_databases_pgvector_sse.md`**](system-design/12_ai_vector_databases_pgvector_sse.md) — Vector Embeddings, HNSW Graph Indexing vs IVFFlat, pgvector & Streaming LLM responses via SSE.
 - [x] 📄 [**`13_reconciliation_matching_systems.md`**](system-design/13_reconciliation_matching_systems.md) — Transaction Reconciliation, Matching Algorithms, Discrepancy Detection, Settlement File Parsing & Resolution Workflows.
+- [x] 📄 [**`14_case_studies_interview.md`**](system-design/14_case_studies_interview.md) — System Design Case Studies: Interview Attack Framework (Rate Limiter, URL Shortener, Notifications, and Food Delivery App).
+- [x] 📄 [**`15_troubleshooting_scenarios.md`**](system-design/15_troubleshooting_scenarios.md) — Troubleshooting & Debugging Scenarios: Production War Stories (Latency Spikes, DB CPU 100%, Memory Leaks, and Queue Backlogs).
+- [x] 📄 [**`observability_pillars.md`**](system-design/observability_pillars.md) — Observability: Metrics, Logs, Traces & SLOs (from a Real Homelab), Prometheus, Loki, Grafana, OpenTelemetry.
+- [x] 📄 [**`ddd_bounded_context_outbox.md`**](system-design/ddd_bounded_context_outbox.md) — Domain-Driven Design: Bounded Contexts, Aggregates & the Outbox Pattern.
 
 ---
 
