@@ -6,7 +6,11 @@ This guide details best practices for user authentication (Sanctum/Passport), au
 
 ## 💡 Conceptual Blueprint & First Principles
 
-When building software in Laravel, securing endpoints and formatting response payloads is crucial.
+When building software in Laravel, securing endpoints and formatting response payloads is crucial. Think of it like an **airport**:
+
+*   **Authentication (The Passport Check)**: This is proving *who you are*. When you present your ID/passport, the guard verifies "Yes, you are John." In APIs, this is handled by tokens (like a wristband given to you after showing your ID).
+*   **Authorization (The Boarding Pass)**: This is proving *what you are allowed to do*. Having a passport doesn't mean you can sit in the pilot's cabin or enter the first-class lounge. A Policy checks if your ticket (user permissions) allows you to enter specific gates.
+*   **API Resources (The Store Receipt)**: When you buy a coffee, the store's database tracks wholesale costs, supplier emails, and margin details. But your receipt only shows the name of the coffee and the price. API Resources act as this custom receipt—they filter out internal database columns (like passwords or raw timestamps) and only show what the client needs to see.
 
 ```mermaid
 graph LR
@@ -26,7 +30,7 @@ graph LR
 ## 🔬 Under-the-Hood Mechanics
 
 ### Sanctum Token Authentication
-1. The client sends credentials to a login endpoint.
+1. The client sends credentials (email and password) to a login endpoint.
 2. The controller validates credentials and creates a token: `$user->createToken('token-name')->plainTextToken`.
 3. The server hashes the token and stores it in the `personal_access_tokens` table.
 4. The client includes the token in the `Authorization: Bearer <token>` header of subsequent requests.
@@ -52,7 +56,7 @@ class PostPolicy
      */
     public function update(User $user, Post $post): bool
     {
-        // Only the owner or an admin can update the post
+        // Rule: Only the user who created the post, OR an Admin, is authorized to update it.
         return $user->id === $post->user_id || $user->hasRole('admin');
     }
 }
@@ -72,9 +76,10 @@ class PostController extends Controller
 {
     public function update(Request $request, Post $post)
     {
-        // Enforces PostPolicy@update
+        // Enforces PostPolicy@update. If unauthorized, automatically throws a 403 Forbidden exception.
         $this->authorize('update', $post);
 
+        // Update the post with request data
         $post->update($request->all());
 
         return response()->json(['message' => 'Post updated successfully.']);
@@ -93,6 +98,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class PostResource extends JsonResource
 {
+    // Formats how the Post model will be serialized into JSON
     public function toArray(Request $request): array
     {
         return [
@@ -100,9 +106,12 @@ class PostResource extends JsonResource
             'title' => $this->title,
             'slug' => $this->slug,
             'content' => $this->content,
+            // Format timestamps into a standardized ISO-8601 string
             'created_at' => $this->created_at->toIso8601String(),
             
-            // Conditional eager-loaded relationship to avoid N+1 queries
+            // Conditional eager-loaded relationship: 
+            // ONLY includes the user data if it has already been loaded in the query.
+            // This prevents triggering a lazy loading database query (resolves N+1 issue).
             'user' => new UserResource($this->whenLoaded('user')),
         ];
     }

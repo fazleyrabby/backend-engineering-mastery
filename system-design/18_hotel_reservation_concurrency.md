@@ -6,7 +6,11 @@ This guide details the system design, data modeling, and transaction safety requ
 
 ## 💡 Conceptual Blueprint & First Principles
 
-Booking systems require strict consistency (no double bookings) alongside high availability for browsing inventories.
+Booking systems require strict consistency (no double bookings) alongside high availability for browsing inventories. Think of it like this:
+
+*   **Pessimistic Locking (The Ticket Counter Queue)**: When you ask for a ticket, the teller holds it in their hand and won't let anyone else touch it until you pay or walk away. This ensures no one else can buy it, but everyone behind you has to wait in a slow line.
+*   **Optimistic Locking (The Document Version Check)**: Two editors download the same document (Version 1) to edit. Editor A finishes first and uploads it; the system saves it as Version 2. Editor B tries to upload their changes, but the system checks: "Wait, you are submitting changes based on Version 1, but the document is already Version 2!" The system rejects Editor B's edit, and Editor B must refresh and try again.
+*   **Database Check Constraints (The Water Bucket Overflow)**: Imagine a bucket that can hold exactly 10 gallons. No matter how fast or how many people pour water in, the bucket physically overflows if it goes past 10. A SQL `CHECK` constraint is a database-level bucket guardrail—if any transaction tries to add inventory past the limit, the database throws a hard block immediately.
 
 ```mermaid
 graph TD
@@ -56,28 +60,34 @@ use Illuminate\Support\Facades\DB;
 
 public function reservePessimistic(int $hotelId, int $roomTypeId, string $start, string $end, int $qty)
 {
+    // Start database transaction
     return DB::transaction(function () use ($hotelId, $roomTypeId, $start, $end, $qty) {
-        // Locks rows matching date range
+        
+        // 1. Fetch matching dates and LOCK the rows (Pessimistic Lock)
+        // No other connection can edit or lock these rows until our transaction completes.
         $inventories = DB::table('room_type_inventory')
             ->where('hotel_id', $hotelId)
             ->where('room_type_id', $roomTypeId)
             ->whereBetween('date', [$start, $end])
-            ->lockForUpdate()
+            ->lockForUpdate() // <- Instructs database to lock these rows (SELECT ... FOR UPDATE)
             ->get();
 
+        // 2. Verify availability under the lock
         foreach ($inventories as $inv) {
+            // Allows up to 10% overbooking limit
             if (($inv->total_reserved + $qty) > ($inv->total_inventory * 1.10)) {
                 throw new \Exception("Insufficient inventory for date: {$inv->date}");
             }
         }
 
+        // 3. Increment reserved quantity
         DB::table('room_type_inventory')
             ->where('hotel_id', $hotelId)
             ->where('room_type_id', $roomTypeId)
             ->whereBetween('date', [$start, $end])
             ->increment('total_reserved', $qty);
 
-        return true;
+        return true; // Transaction commits successfully, locks are released
     });
 }
 ```
@@ -87,17 +97,18 @@ public function reservePessimistic(int $hotelId, int $roomTypeId, string $start,
 Allows simultaneous reads, but verifies the row version hasn't changed before writing.
 
 ```php
-// Update checks if version matches original fetch
+// Step 1: Attempt to write the change, but ONLY if the version matches the one we fetched
+// $originalVersion is what we read earlier. If another query updated it first, the version is now higher.
 $updated = DB::table('room_type_inventory')
     ->where('id', $invId)
-    ->where('version', $originalVersion)
+    ->where('version', $originalVersion) // Ensure no one edited this row since we fetched it
     ->update([
         'total_reserved' => $newReserved,
-        'version' => $originalVersion + 1
+        'version' => $originalVersion + 1 // Increment version number
     ]);
 
 if (!$updated) {
-    // Conflict detected: roll back and retry
+    // Conflict detected: someone else got in first! Roll back and retry.
     throw new ConcurrentModificationException("Inventory updated by another request.");
 }
 ```
@@ -107,6 +118,9 @@ if (!$updated) {
 The database prevents updates that violate inventory rules.
 
 ```sql
+-- Enforces a strict validation limit directly inside the database engine.
+-- If any update attempts to push total_reserved past total_inventory * 1.10,
+-- the database rejects the command and throws an error immediately.
 ALTER TABLE room_type_inventory 
 ADD CONSTRAINT check_inventory_limit 
 CHECK (total_reserved <= CAST(total_inventory * 1.10 AS UNSIGNED));
