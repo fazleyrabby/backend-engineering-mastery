@@ -53,7 +53,7 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 | :--- | :--- | :--- | :---: |
 | **01** | [**CS Fundamentals**](cs-fundamentals/) | CPU, Memory, Linux I/O, `epoll`, TCP/TLS 1.3, Big-O, Dynamic Programming, OWASP | `8 / 8 Complete` |
 | **02** | [**Database Deep Dives**](database-deep-dives/) | MySQL InnoDB Buffer Pool, ClickHouse Columnar MergeTree, Redis SDS & Redlock, SQL Mastery, Normalization | `6 / 6 Complete` |
-| **03** | [**System Design & Real-Time**](system-design/) | WebSockets, Financial Idempotency, Kafka Pub/Sub, Sharding, Saga, Fraud Engine, Reconciliation | `13 / 13 Complete` |
+| **03** | [**System Design & Real-Time**](system-design/) | WebSockets, Idempotency, Kafka, Sharding, Saga, Fraud Engine, Matching Engine, Reservations | `19 / 19 Complete` |
 | **04** | [**Laravel Internals**](laravel-internals/) | Reflection Container, Request Lifecycle, Eloquent Hydration, Octane Safety | `6 / 6 Complete` |
 | **05** | [**Laravel Mastery**](laravel-mastery/) | Routing, Eloquent, Auth, Testing, APIs, Job Queues & Design Patterns | `0 / 6 Complete` |
 | **06** | [**Cloud & DevOps**](cloud-devops/) | Docker Kernel Namespaces, CI/CD, AWS Architecture, Terraform, SAA-C03 Guide | `5 / 5 Complete` |
@@ -102,6 +102,8 @@ When acting as an AI Tutor or pair programmer within this workspace, enforce the
 - [x] 📄 [**`15_troubleshooting_scenarios.md`**](system-design/15_troubleshooting_scenarios.md) — Troubleshooting & Debugging Scenarios: Production War Stories (Latency Spikes, DB CPU 100%, Memory Leaks, and Queue Backlogs).
 - [x] 📄 [**`16_observability_pillars.md`**](system-design/16_observability_pillars.md) — Observability: Metrics, Logs, Traces & SLOs (from a Real Homelab), Prometheus, Loki, Grafana, OpenTelemetry.
 - [x] 📄 [**`17_ddd_bounded_context_outbox.md`**](system-design/17_ddd_bounded_context_outbox.md) — Domain-Driven Design: Bounded Contexts, Aggregates & the Outbox Pattern.
+- [x] 📄 [**`18_hotel_reservation_concurrency.md`**](system-design/18_hotel_reservation_concurrency.md) — Hotel Reservation Systems: Locking patterns (pessimistic, optimistic), DB constraints & Redis inventory caching.
+- [x] 📄 [**`19_stock_exchange_matching_engine.md`**](system-design/19_stock_exchange_matching_engine.md) — Stock Exchange Architecture: L3 Order Books, FIFO matching algorithm loops, sequencers & low-latency execution paths.
 
 ---
 
